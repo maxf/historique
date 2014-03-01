@@ -1,0 +1,11 @@
+<div><a href="{% url 'events:people' %}">Personnes</a>, <a href="{% url 'events:events' %}">Historique</a></div>
+
+<h1>{{person.name}}</h1>
+
+<h2>Liens</h2>
+
+{% include "common/links_helper.html" %}
+
+<h2>Historique</h2>
+
+{% include "events/template_list.html" %}

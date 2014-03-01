@@ -1,0 +1,9 @@
+{% if events %}
+  <ul>
+  {% for event in events %}
+      <li><a href="{% url 'events:event' event.id %}">{{ event.title }}</a> ({{ event.date }})</li>
+  {% endfor %}
+  </ul>
+{% else %}
+  <p>Pas d'historique.</p>
+{% endif %}
