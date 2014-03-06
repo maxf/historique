@@ -25,6 +25,12 @@ def send_comment(request, event_id):
     target_event.comment_set.create(text=request.POST['comment_text'])
     return redirect(target_event)
 
+def delete_comment(request, event_id, comment_id):
+    target_event = get_object_or_404(Event, id=event_id)
+    target_comment = Comment.objects.filter(id=comment_id)
+    target_comment.delete()
+    return redirect(target_event)
+
 def person(request, person_id):
     person = get_object_or_404(Person, id=person_id)
     links = person.links.all()
