@@ -19,7 +19,7 @@
 {% if comments %}
   <ul>
   {% for comment in comments %}
-    <li>{{comment.text}} <form action="{% url 'events:delete_comment' event.id comment.id %}" method="post">{% csrf_token %}<input type="submit" value="Effacer"/></form></li>
+    <li><form action="{% url 'events:delete_comment' event.id comment.id %}" method="post">{% csrf_token %}{{comment.text}} <input type="submit" value="Effacer"/></form></li>
   {% endfor %}
   </ul>
 {% else %}

@@ -27,7 +27,7 @@ def send_comment(request, event_id):
 
 def delete_comment(request, event_id, comment_id):
     target_event = get_object_or_404(Event, id=event_id)
-    target_comment = Comment.objects.filter(id=comment_id)
+    target_comment = Comment.objects.get(id=comment_id)
     target_comment.delete()
     return redirect(target_event)
 
