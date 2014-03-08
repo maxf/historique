@@ -1,16 +1,20 @@
-<div><a href="{% url 'events:events' %}">Historique</a></div>
+<html>
+  <head>
+    {% include 'common/stylesheets.html' %}
+  </head>
+  <body>
+    <div><a href="{% url 'events:events' %}">Historique</a></div>
 
-<h1>Personnes</h1>
+    <h1>Personnes</h1>
 
-{% include "people/template_list.html" %}
+    {% include "people/template_list.html" %}
 
-<h2>Ajouter une personne</h2>
-<form action="{% url 'events:add_person' %}" method="post">
+    <h2>Ajouter une personne</h2>
 
-{% csrf_token %}
-
-  <input type="text" name="name"/>
-  <input type="submit" value="Créer" />
-</form>
-
-
+    <form action="{% url 'events:add_person' %}" method="post">
+      {% csrf_token %}
+      <input type="text" name="name"/>
+      <input type="submit" value="Créer" />
+    </form>
+  </body>
+</html>

@@ -1,37 +1,44 @@
-<div><a href="{% url 'events:people' %}">Personnes</a>, <a href="{% url 'events:events' %}">Historique</a></div>
+<html>
+  <head>
+    {% include 'common/stylesheets.html' %}
+  </head>
+  <body>
+    <div><a href="{% url 'events:people' %}">Personnes</a>, <a href="{% url 'events:events' %}">Historique</a></div>
 
-<h1>{{ event.title }}</h1>
+    <h1>{{ event.title }}</h1>
 
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<div>{{ event.eventType }}, {{ event.date }}</div>
+    <div>{{ event.eventType }}, {{ event.date }}</div>
 
-<h2>Liens</h2>
+    <h2>Liens</h2>
 
-{% include "common/links_helper.html" %}
+    {% include "common/links_helper.html" %}
 
-<h2>Participants</h2>
+    <h2>Participants</h2>
 
-{% include "people/template_list.html" %}
+    {% include "people/template_list.html" %}
 
-<h2>Commentaires</h2>
+    <h2>Commentaires</h2>
 
-{% if comments %}
-  <ul>
-  {% for comment in comments %}
-    <li><form action="{% url 'events:delete_comment' event.id comment.id %}" method="post">{% csrf_token %}{{comment.text}} <input type="submit" value="Effacer"/></form></li>
-  {% endfor %}
-  </ul>
-{% else %}
-  <p>Pas de commentaires</p>
-{% endif %}
+    {% if comments %}
+      <ul>
+      {% for comment in comments %}
+        <li><form action="{% url 'events:delete_comment' event.id comment.id %}" method="post">{% csrf_token %}{{comment.text}} <input type="submit" value="Effacer"/></form></li>
+      {% endfor %}
+      </ul>
+    {% else %}
+      <p>Pas de commentaires</p>
+    {% endif %}
 
-<h2>Ajouter un commentaire</h2>
-<form action="{% url 'events:send_comment' event.id %}" method="post">
+    <h2>Ajouter un commentaire</h2>
+    <form action="{% url 'events:send_comment' event.id %}" method="post">
 
-{% csrf_token %}
+    {% csrf_token %}
 
-  <textarea name="comment_text" rows="10" cols="50"></textarea>
+      <textarea name="comment_text" rows="10" cols="50"></textarea>
 
-  <input type="submit" value="Envoyer" />
-</form>
+      <input type="submit" value="Envoyer" />
+    </form>
+  </body>
+</html>
