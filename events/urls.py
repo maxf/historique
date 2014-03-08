@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, url
 from events import views
+from django.conf import settings
 
 urlpatterns = patterns('',
     url(r'^$', views.events, name='events'),
@@ -10,3 +11,4 @@ urlpatterns = patterns('',
     url(r'^event/(?P<event_id>\d+)/delete_comment/(?P<comment_id>\d+)/$', views.delete_comment, name='delete_comment'),
     url(r'^person/(?P<person_id>\d+)/$', views.person, name='person'),
 )
+

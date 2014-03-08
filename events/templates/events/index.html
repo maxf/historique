@@ -1,7 +1,14 @@
-<div><a href="{% url 'events:people' %}">Personnes</a></div>
+{% load staticfiles %}
+<html>
+  <head>
+    <link rel="stylesheet" href="{% static 'events/base.css' %}"/>
+  </head>
+  <body>
+    <div><a href="{% url 'events:people' %}">Personnes</a></div>
 
-<h1>Historique</h1>
-
-{% include "events/template_list.html" %}
-
+    <h1>Historique</h1>
+    
+    {% include "events/template_list.html" %}
+  </body>
+</html>
 
