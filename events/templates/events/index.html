@@ -3,15 +3,22 @@
     {% include 'common/head.html' %}
     <title>Historique</title>
   </head>
-  <body>
-    <div><a href="{% url 'events:people' %}">Personnes</a></div>
+  <body role="document">
+    {% include 'common/header.html' %}
 
-    <h1>Historique</h1>
+    <div class="container theme-showcase" role="main">
 
-    {% include "events/template_list.html" %}
+      <div class="jumbotron">
+        <h1>L'histoire du LIFL</h1>
+        <p>blah blah blah</p>
+      </div>
 
-    {% include 'common/scripts.html' %}
-
+      <h1>Historique</h1>
+  
+      {% include "events/template_list.html" %}
+  
+      {% include 'common/scripts.html' %}
+    </div>
   </body>
 </html>
 

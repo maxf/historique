@@ -4,20 +4,23 @@
     <title>{{Personnes}}</title>
   </head>
   <body>
-    <div><a href="{% url 'events:events' %}">Historique</a></div>
+    {% include 'common/header.html' %}
 
-    <h1>Personnes</h1>
+    <div class="container theme-showcase" role="main">
+      <div class="jumbotron">
+        <h1>Personnes</h1>
+      </div>
 
-    {% include "people/template_list.html" %}
+      {% include "people/template_list.html" %}
 
-    <h2>Ajouter une personne</h2>
+      <h2>Ajouter une personne</h2>
+      <form action="{% url 'events:add_person' %}" method="post">
+        {% csrf_token %}
+        <input type="text" name="name"/>
+        <input type="submit" value="Créer" />
+      </form>
 
-    <form action="{% url 'events:add_person' %}" method="post">
-      {% csrf_token %}
-      <input type="text" name="name"/>
-      <input type="submit" value="Créer" />
-    </form>
-
+    </div>
     {% include 'common/scripts.html' %}
 
   </body>
