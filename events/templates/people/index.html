@@ -1,6 +1,7 @@
 <html>
   <head>
-    {% include 'common/stylesheets.html' %}
+    {% include 'common/head.html' %}
+    <title>{{Personnes}}</title>
   </head>
   <body>
     <div><a href="{% url 'events:events' %}">Historique</a></div>
@@ -16,5 +17,8 @@
       <input type="text" name="name"/>
       <input type="submit" value="Créer" />
     </form>
+
+    {% include 'common/scripts.html' %}
+
   </body>
 </html>

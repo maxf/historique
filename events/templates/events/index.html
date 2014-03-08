@@ -1,6 +1,7 @@
 <html>
   <head>
-    {% include 'common/stylesheets.html' %}
+    {% include 'common/head.html' %}
+    <title>Historique</title>
   </head>
   <body>
     <div><a href="{% url 'events:people' %}">Personnes</a></div>
@@ -8,6 +9,9 @@
     <h1>Historique</h1>
 
     {% include "events/template_list.html" %}
+
+    {% include 'common/scripts.html' %}
+
   </body>
 </html>
 
