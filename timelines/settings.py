@@ -69,10 +69,10 @@ WSGI_APPLICATION = 'timelines.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ['DBNAME'],
-        'USER': os.environ['DBUSER'],
-        'PASSWORD': os.environ['DBPASSWORD'],
-        'HOST': os.environ['DBHOST'],
+        'NAME': os.environ['PGDATABASE'],
+        'USER': os.environ['PGUSER'],
+        'PASSWORD': os.environ['PGPASSWORD'],
+        'HOST': os.environ['PGHOST'],
     }
 }
 
