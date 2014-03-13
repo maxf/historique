@@ -21,21 +21,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-print "SECRET_KEY: "+SECRET_KEY
-
 # SECURITY WARNING: don't run with debug turned on in production!
 
 DEBUG = bool(os.environ.get('DEBUG', False))
 
-print "DEBUG: "+str(DEBUG)
-
 TEMPLATE_DEBUG = bool(os.environ.get('TEMPLATE_DEBUG', False))
-
-print "TEMPLATE_DEBUG: "+str(TEMPLATE_DEBUG)
 
 ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOST')]
 
-print "ALLOWED_HOSTS: "+str(ALLOWED_HOSTS)
 
 # Application definition
 
@@ -100,5 +93,11 @@ STATIC_ROOT = os.environ.get('STATIC_ROOT', '')
 CSRF_COOKIE_SECURE=bool(os.environ.get('CSRF_COOKIE_SECURE', False))
 SESSION_COOKIE_SECURE=bool(os.environ.get('SESSION_COOKIE_SECURE', False))
 
+
+print "SECRET_KEY: "+SECRET_KEY
+print "DEBUG: "+str(DEBUG)
+print "TEMPLATE_DEBUG: "+str(TEMPLATE_DEBUG)
+print "ALLOWED_HOSTS: "+str(ALLOWED_HOSTS)
+print "DATABASES: "+str(DATABASES)
 print "CSRF_COOKIE_SECURE: "+str(CSRF_COOKIE_SECURE)
 print "SESSION_COOKIE_SECURE: "+str(SESSION_COOKIE_SECURE)
