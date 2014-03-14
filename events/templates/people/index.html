@@ -13,13 +13,6 @@
 
       {% include "people/template_list.html" %}
 
-      <h2>Ajouter une personne</h2>
-      <form action="{% url 'events:add_person' %}" method="post">
-        {% csrf_token %}
-        <input type="text" name="name"/>
-        <input type="submit" value="Créer" />
-      </form>
-
     </div>
     {% include 'common/scripts.html' %}
 
