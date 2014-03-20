@@ -19,15 +19,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # SECURITY WARNING: keep the secret key used in production secret!
 #
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'development_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = bool(os.environ.get('DEBUG', False))
+DEBUG = bool(os.environ.get('DEBUG', True))
 
-TEMPLATE_DEBUG = bool(os.environ.get('TEMPLATE_DEBUG', False))
+TEMPLATE_DEBUG = bool(os.environ.get('TEMPLATE_DEBUG', True))
 
-ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOST')]
+ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOST','127.0.0.1')]
 
 
 # Application definition
@@ -62,10 +62,10 @@ WSGI_APPLICATION = 'timelines.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ['PGDATABASE'],
-        'USER': os.environ['PGUSER'],
-        'PASSWORD': os.environ['PGPASSWORD'],
-        'HOST': os.environ['PGHOST'],
+        'NAME': os.environ.get('PGDATABASE','timelines'),
+        'USER': os.environ.get('PGUSER','timelines'),
+        'PASSWORD': os.environ.get('PGPASSWORD','timelines'),
+        'HOST': os.environ.get('PGHOST','localhost')
     }
 }
 
