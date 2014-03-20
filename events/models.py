@@ -10,6 +10,7 @@ class Link(models.Model):
 class Person(models.Model):
     name = models.CharField(max_length=100)
     links = models.ManyToManyField(Link, blank=True, null=True)
+    photo = models.URLField(blank=True)
     def __unicode__(self):
         return self.name
 
@@ -17,7 +18,7 @@ class Event(models.Model):
     title = models.CharField(max_length=200)
     description = models.CharField(max_length=2000, blank=True)
     eventType = models.CharField(max_length=50, blank=True)
-    date = models.DateField('Event date', blank=True)
+    date = models.DateField('Event date', blank=True, null=True)
     links = models.ManyToManyField(Link, blank=True, null=True)
     people = models.ManyToManyField(Person, blank=True)
     def __unicode__(self):

@@ -8,7 +8,10 @@
 
     <div class="container theme-showcase" role="main">
       <div class="jumbotron">
-        <h1>{{ person.name }}</h1>
+        <h1>
+          {% if person.photo %} <img src="{{ person.photo }}" alt="photo"/> {% endif %}
+          {{ person.name }} 
+        </h1>
       </div>
 
       <h2>Liens</h2>
