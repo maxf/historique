@@ -1,6 +1,4 @@
 Django==1.6.2
-MySQL-python==1.2.5
-PyMySQL==0.6.1
 psycopg2==2.5.2
 stevedore==0.14.1
 vboxapi==1.0
