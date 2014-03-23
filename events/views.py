@@ -1,6 +1,11 @@
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 from events.models import Event, Comment, Person, Link
+from events.serializers import PersonSerializer, PeopleSerializer
+
 
 def events(request):
     events = Event.objects.order_by('date')
@@ -40,3 +45,27 @@ def person(request, person_id):
 def add_person(request):
     Person(name=request.POST['name']).save()
     return redirect('/events/people/')
+
+class PeopleList(APIView):
+    """
+    List all people
+    """
+    def get(self, request, format=None):
+        people = Person.objects.all()
+        serializer = PeopleSerializer(people, many=True)
+        return Response(serializer.data)
+
+class PersonDetail(APIView):
+    """
+    API endpoint that allows one person to be viewed
+    """
+    def get_object(self, pk):
+        try:
+            return Person.objects.get(pk=pk)
+        except Person.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        person = self.get_object(pk)
+        serializer = PersonSerializer(person)
+        return Response(serializer.data)

@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'events'
 )
 
@@ -93,6 +94,14 @@ STATIC_ROOT = os.environ.get('STATIC_ROOT', '')
 CSRF_COOKIE_SECURE=bool(os.environ.get('CSRF_COOKIE_SECURE', False))
 SESSION_COOKIE_SECURE=bool(os.environ.get('SESSION_COOKIE_SECURE', False))
 
+
+
+REST_FRAMEWORK = {
+    # Use hyperlinked styles by default.
+    # Only used if the `serializer_class` attribute is not set on a view.
+    'DEFAULT_MODEL_SERIALIZER_CLASS':
+        'rest_framework.serializers.HyperlinkedModelSerializer',
+}
 
 #print "SECRET_KEY: "+SECRET_KEY
 #print "DEBUG: "+str(DEBUG)
