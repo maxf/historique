@@ -2,7 +2,7 @@ from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, generics
 from events.models import Event, Comment, Person, Link
 from events.serializers import PersonSerializer, PeopleSerializer, EventSerializer
 
@@ -46,14 +46,12 @@ def add_person(request):
     Person(name=request.POST['name']).save()
     return redirect('/events/people/')
 
-class PeopleList(APIView):
+class PeopleList(generics.ListAPIView):
     """
     List all people
     """
-    def get(self, request, format=None):
-        people = Person.objects.all()
-        serializer = PeopleSerializer(people, many=True)
-        return Response(serializer.data)
+    model = Person
+    serializer_class = PeopleSerializer
 
 class PersonDetail(APIView):
     """
