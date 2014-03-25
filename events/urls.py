@@ -5,7 +5,8 @@ from django.conf import settings
 
 
 urlpatterns = patterns('',
-    url(r'^$', views.events, name='events'),
+    url(r'^$', views.home, name='home'),
+    url(r'^events/$', views.events, name='events'),
     url(r'^people/$', views.people, name='people'),
     url(r'^people/add/$', views.add_person, name='add_person'),
     url(r'^event/(?P<event_id>\d+)/$', views.event, name='event'),

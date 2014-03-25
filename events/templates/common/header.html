@@ -7,11 +7,11 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">Historique</a>
+      <a class="navbar-brand" href="{% url 'events:home' %}">Histoire du LIFL</a>
     </div>
     <div class="collapse navbar-collapse">
       <ul class="nav navbar-nav">
-        <li><a href="{% url 'events:events' %}">Accueil</a></li>
+        <li><a href="{% url 'events:events' %}">Historique</a></li>
         <li><a href="{% url 'events:people' %}">Personnes</a></l>
       </ul>
     </div><!--/.nav-collapse -->

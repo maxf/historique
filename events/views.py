@@ -6,6 +6,8 @@ from rest_framework import status, generics
 from events.models import Event, Comment, Person, Link
 from events.serializers import PersonSerializer, PeopleSerializer, EventSerializer
 
+def home(request):
+    return render(request, 'home/index.html')
 
 def events(request):
     events = Event.objects.order_by('date')

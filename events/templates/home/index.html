@@ -1,7 +1,7 @@
 <html>
   <head>
     {% include 'common/head.html' %}
-    <title>Historique</title>
+    <title>Histoire du LIFL</title>
   </head>
   <body role="document">
     {% include 'common/header.html' %}
@@ -9,12 +9,12 @@
     <div class="container theme-showcase" role="main">
 
       <div class="jumbotron">
-        <h1>Historique</h1>
+        <h1>L'histoire du LIFL</h1>
+        <p>blah blah blah</p>
       </div>
 
-      {% include "events/template_list.html" %}
-  
-      {% include 'common/scripts.html' %}
+      <canvas id="timegraph" width="800" height="400"/>
+
     </div>
   </body>
 </html>
