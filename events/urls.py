@@ -15,6 +15,7 @@ urlpatterns = patterns('',
 
     url(r'^api/people/$', views.PeopleList.as_view()),
     url(r'^api/person/(?P<pk>[0-9]+)/$', views.PersonDetail.as_view()),
+    url(r'^api/event/(?P<pk>[0-9]+)/$', views.EventDetail.as_view()),
 )
 
 urlpatterns = format_suffix_patterns(urlpatterns)

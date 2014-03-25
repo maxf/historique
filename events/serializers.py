@@ -7,10 +7,13 @@ class PeopleSerializer(serializers.HyperlinkedModelSerializer):
         model = Person
         fields = ('id', 'name')
 
+class EventSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Event
+        fields = ('id', 'title', 'description')
+
 class PersonSerializer(serializers.HyperlinkedModelSerializer):
+    events = EventSerializer(many=True)
     class Meta:
         model = Person
-        fields = ('id', 'name', 'photo')
-
-
-
+        fields = ('id', 'name', 'photo', 'events')

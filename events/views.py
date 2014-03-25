@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from events.models import Event, Comment, Person, Link
-from events.serializers import PersonSerializer, PeopleSerializer
+from events.serializers import PersonSerializer, PeopleSerializer, EventSerializer
 
 
 def events(request):
@@ -68,4 +68,19 @@ class PersonDetail(APIView):
     def get(self, request, pk, format=None):
         person = self.get_object(pk)
         serializer = PersonSerializer(person)
+        return Response(serializer.data)
+
+class EventDetail(APIView):
+    """
+    API endpoint that allows one event to be viewed
+    """
+    def get_object(self, pk):
+        try:
+            return Event.objects.get(pk=pk)
+        except Event.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        event = self.get_object(pk)
+        serializer = EventSerializer(event)
         return Response(serializer.data)
