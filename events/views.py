@@ -1,8 +1,7 @@
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
-from rest_framework.views import APIView
+from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework import status, generics
 from events.models import Event, Comment, Person, Link
 from events.serializers import PersonSerializer, PeopleSerializer, EventSerializer
 
@@ -44,43 +43,34 @@ def person(request, person_id):
     events = Event.objects.filter(people=person)
     return render(request, 'person/index.html', {'person': person, 'links': links, 'events': events})
 
-def add_person(request):
-    Person(name=request.POST['name']).save()
-    return redirect('/events/people/')
 
-class PeopleList(generics.ListAPIView):
-    """
-    List all people
-    """
-    model = Person
-    serializer_class = PeopleSerializer
 
-class PersonDetail(APIView):
-    """
-    API endpoint that allows one person to be viewed
-    """
-    def get_object(self, pk):
-        try:
-            return Person.objects.get(pk=pk)
-        except Person.DoesNotExist:
-            raise Http404
+# API viewsets
 
-    def get(self, request, pk, format=None):
-        person = self.get_object(pk)
+class PersonViewSet(viewsets.ModelViewSet):
+    serializer_class = PersonSerializer
+    queryset = Person.objects.all()
+    def list(self, request):
+        queryset = Person.objects.all()
+        serializer = PersonSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        queryset = Person.objects.all()
+        person = get_object_or_404(queryset, pk=pk)
         serializer = PersonSerializer(person)
         return Response(serializer.data)
 
-class EventDetail(APIView):
-    """
-    API endpoint that allows one event to be viewed
-    """
-    def get_object(self, pk):
-        try:
-            return Event.objects.get(pk=pk)
-        except Event.DoesNotExist:
-            raise Http404
+class EventViewSet(viewsets.ModelViewSet):
+    serializer_class = EventSerializer
+    queryset = Person.objects.all()
+    def list(self, request):
+        queryset = Event.objects.all()
+        serializer = EventSerializer(queryset, many=True)
+        return Response(serializer.data)
 
-    def get(self, request, pk, format=None):
-        event = self.get_object(pk)
+    def retrieve(self, request, pk=None):
+        queryset = Event.objects.all()
+        event = get_object_or_404(queryset, pk=pk)
         serializer = EventSerializer(event)
         return Response(serializer.data)

@@ -5,7 +5,7 @@ from rest_framework import serializers
 class PeopleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Person
-        fields = ('id', 'name')
+        fields = ('id','name')
         depth = 1
 
 class EventShortSerializer(serializers.HyperlinkedModelSerializer):

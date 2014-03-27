@@ -13,6 +13,8 @@ class Person(models.Model):
     photo = models.URLField(blank=True)
     def __unicode__(self):
         return self.name
+    def get_absolute_url(self):
+        return "/events/person/%i/" % self.id
 
 class Event(models.Model):
     title = models.CharField(max_length=200)
