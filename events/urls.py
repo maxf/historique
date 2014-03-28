@@ -24,5 +24,6 @@ urlpatterns = patterns('',
 
 
 router = DefaultRouter()
-router.register(r'^api/person', views.PersonViewSet)
+router.register(r'api/person', views.PersonViewSet)
+router.register(r'api/event', views.EventViewSet)
 urlpatterns += router.urls
