@@ -63,7 +63,7 @@ class PersonViewSet(viewsets.ModelViewSet):
 
 class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
-    queryset = Person.objects.all()
+    queryset = Event.objects.all()
     def list(self, request):
         queryset = Event.objects.all()
         serializer = EventSerializer(queryset, many=True)
