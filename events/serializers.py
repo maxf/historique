@@ -11,7 +11,7 @@ class PeopleSerializer(serializers.HyperlinkedModelSerializer):
 class EventShortSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Event
-        fields = ('id','title')
+        fields = ('id','title','date')
 
 class PersonShortSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
