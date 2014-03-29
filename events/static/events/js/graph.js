@@ -34,7 +34,7 @@ d3.json("/events/api/event/", function(error, events) {
       timeline = person.event_set.sort(function(e1,e2) { return e1.date > e2.date; });
 console.log(timeline);
       // links are found between events along the timeline
-      for (j=0; j<timeline.length-2; j++) {
+      for (j=0; j<timeline.length-1; j++) {
         for (k=0; k<graph.nodes.length; k++) {
           if(timeline[j].id === events[k].id) { source_index = k; }
           if(timeline[j+1].id === events[k].id) { target_index = k; }
