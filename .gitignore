@@ -1,6 +1,6 @@
 *.log
 *.pot
 *.pyc
-.tern-post
+.tern-port
 local_settings.py
 virtualenv
