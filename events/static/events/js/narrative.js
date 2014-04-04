@@ -796,8 +796,8 @@ var Narrative = function() {
         var chars = [];
         var char_map = []; // maps id to pointer
         for (var i = 0; i < xchars.length; i++) {
-//          chars[chars.length] = new Character_(xchars[i].name, xchars[i].id, xchars[i].group);
-          chars[chars.length] = new Character_(xchars[i].name, xchars[i].id, 0);
+          xchars[i].group = 0; // no group information in API, currently
+          chars[chars.length] = new Character_(xchars[i].name, xchars[i].id, xchars[i].group);
           char_map[xchars[i].id] = chars[chars.length-1];
         }
         var groups = define_groups(chars);
