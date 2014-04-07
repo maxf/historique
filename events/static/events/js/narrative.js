@@ -86,7 +86,7 @@ var Narrative = function() {
     this.in_links = [];
     this.out_links = [];
     this.name = "";
-    this.has_char = function(id) {
+    this.has_person = function(id) {
       for (var i = 0; i < this.chars.length; i++) {
         if (id === this.chars[i]) {
           return true;
@@ -125,17 +125,18 @@ var Narrative = function() {
       .attr("d", function(d) { return get_path(d); });
   } // reposition_link_nodes
 
-  function generate_links(chars, scenes) {
-    var i,j,links = [], char_scenes;
+  function generate_links(people, events) {
+    var i,j,links=[],person_events;
     function scene_cmp(a,b) { return a.start-b.start; }
-    for (i = 0; i < chars.length; i++) {
-      // The scenes in which the character appears
-      char_scenes = [];
-      for (j = 0; j < scenes.length; j++) {
-        if (scenes[j].has_char(chars[i].id)) {
-          char_scenes[char_scenes.length] = scenes[j];
+    for (i = 0; i < people.length; i++) {
+      // The events in which the person appears
+      person_events = [];
+      for (j = 0; j < events.length; j++) {
+        if (events[j].has_person(people[i].id)) {
+          person_events[person_events.length] = events[j];
         }
       }
+
       char_scenes.sort(scene_cmp);
       chars[i].first_scene = char_scenes[0];
       for (j = 1; j < char_scenes.length; j++) {
@@ -144,11 +145,206 @@ var Narrative = function() {
         char_scenes[j-1].out_links[char_scenes[j-1].out_links.length] = links[links.length-1];
         char_scenes[j].in_links[char_scenes[j].in_links.length] = links[links.length-1];
         //console.log(char_scenes[j].in_links[char_scenes[j].in_links.length-1].y0);
+
+      person_events.sort(scene_cmp);
+      people[i].first_scene = person_events[0];
+      for (j = 1; j < person_events.length; j++) {
+        links[links.length] = new Link(person_events[j-1], person_events[j],
+               people[i].group, people[i].id);
+        links[links.length-1].char_ptr = people[i];
+        //console.log("char name = " + people[i].name + ", group = " + people[i].group);
+        person_events[j-1].out_links[person_events[j-1].out_links.length] = links[links.length-1];
+        person_events[j].in_links[person_events[j].in_links.length] = links[links.length-1];
+        //console.log(person_events[j].in_links[person_events[j].in_links.length-1].y0);
       }
     } // for
     return links;
   } // generate_links
 
+  function Group() {
+    this.min = -1;
+    this.max = -1;
+    this.id = -1;
+    this.chars = [];
+    this.first_scene_chars = []; // NOT USED?
+    this.median_count = 0;
+    this.biggest_scene = 0; // largest scene height. NOT USED
+    this.all_chars = {};
+    this.char_scenes = [];
+    this.order = -1;
+  }
+
+  function sort_groups(groups_sorted, groups_desc, top, bottom) {
+    var i,m,t1,b1,t2,b2,g1,g2;
+    if (groups_desc.length === 2) {
+      groups_sorted[bottom] = groups_desc[0];
+      groups_sorted[top] = groups_desc[1];
+      return;
+    }
+    if (top >= bottom) {
+      if (groups_desc.length > 0) {
+        groups_sorted[top] = groups_desc[0];
+      }
+      return;
+    }
+    m = Math.floor((top + bottom)/2);
+    groups_sorted[m] = groups_desc[0];
+    t1 = top;
+    b1 = m-1;
+    t2 = m+1;
+    b2 = bottom;
+    g1 = [];
+    g2 = [];
+    // TODO: make more efficient
+    for (i = 1; i < groups_desc.length; i++) {
+      if (i % 2 === 0) {
+        g1[g1.length] = groups_desc[i];
+      } else {
+        g2[g2.length] = groups_desc[i];
+      }
+    } // for
+    sort_groups(groups_sorted, g1, t1, b1);
+    sort_groups(groups_sorted, g2, t2, b2);
+  } // sort_groups
+
+  function define_groups(chars) {
+    var groups = [];
+    chars.forEach(function(c) {
+      // Put char in group
+      var g,found_group = false;
+      groups.forEach(function(g) {
+        if (g.id === c.group) {
+          found_group = true;
+          g.chars[g.chars.length] = c;
+          c.group_ptr = g;
+        }
+      });
+      if (!found_group) {
+        g = new Group();
+        g.id = c.group;
+        g.chars[g.chars.length] = c;
+        c.group_ptr = g;
+        groups[groups.length] = g;
+      }
+    });
+    return groups;
+  }
+
+  // for each event, find its median group
+  function find_median_groups(groups, events, people, tie_breaker) {
+    events.forEach(function(event) {
+      var i, group_count, max_index;
+      if (!event.char_node) {
+        group_count = [];
+        for (i = 0; i < groups.length; i++) {
+          group_count[i] = 0;
+        }
+        max_index = 0;
+        event.people.forEach(function(person) {
+          // TODO: Can just search group.people
+//          var i, score1, score2, group_index = find_group(people, groups, c);
+          var i, score1, score2, group_index = 0;
+          group_count[group_index] += 1;
+          if ( (!tie_breaker && group_count[group_index] >= group_count[max_index]) ||
+               (group_count[group_index] > group_count[max_index])) {
+            max_index = group_index;
+          } else {
+            if (group_count[group_index] === group_count[max_index]) {
+              // Tie-breaking
+              score1 = 0;
+              score2 = 0;
+              for (i = 0; i < event.in_links.length; i++) {
+                if (event.in_links[i].from.median_group !== null) {
+                  if (event.in_links[i].from.median_group.id === groups[group_index].id) {
+                    score1 += 1;
+                  } else {
+                    if (event.in_links[i].from.median_group.id === groups[max_index].id) {
+                      score2 += 1;
+                    }
+                  }
+                }
+              }
+              for (i = 0; i < event.out_links.length; i++) {
+                if (event.out_links[i].to.median_group !== null) {
+                  if (event.out_links[i].to.median_group.id === groups[group_index].id) {
+                    score1 += 1;
+                  } else {
+                    if (event.out_links[i].to.median_group.id === groups[max_index].id) {
+                      score2 += 1;
+                    }
+                  }
+                }
+              }
+              if (score1 > score2) {
+                max_index = group_index;
+              }
+            }
+          }
+        });
+        event.median_group = groups[max_index];
+        groups[max_index].median_count += 1;
+        event.people.forEach(function(c) {
+          // This just puts this character in the set
+          // using sets to avoid duplicating characters
+          groups[max_index].all_chars[c] = true;
+        });
+      }
+    });
+    // Convert all the group char sets to regular arrays
+    groups.forEach(function(group) {
+      var c, chars_list = [];
+      for (c in group.all_chars) {
+        if (group.all_chars.hasOwnProperty(c)) {
+          chars_list.push(people[c]);
+        }
+      }
+      group.all_chars = chars_list;
+    });
+    console.log(groups);
+  }
+
+  function sort_groups_main(groups, center_sort) {
+    var groups_cpy = [], i, groups_desc, groups_desc1, groups_desc2, center;
+    groups.sort(function(a, b) {
+      return b.median_count - a.median_count;
+    });
+    for (i = 0; i < groups.length; i++) {
+      groups_cpy[i] = groups[i];
+    }
+    if (!center_sort) {
+      if (groups.length > 0) {
+        groups_cpy[0] = groups[0];
+      }
+      if (groups.length > 1) {
+        groups_cpy[groups.length-1] = groups[1];
+      }
+      if (groups.length > 2) {
+        groups_desc = [];
+        for (i = 0; i < groups.length - 2; i++) {
+          groups_desc[i] = groups[i+2];
+        }
+        // groups_cpy is the one that gets sorted
+        sort_groups(groups_cpy, groups_desc, 1, groups.length-2);
+      }
+    } else {
+      center = Math.floor(groups.length/2.0);
+      groups_cpy[center] = groups[0];
+      groups_desc1 = [];
+      for (i = 0; i < center; i++) {
+        groups_desc1[i] = groups[i];
+      }
+      groups_desc2 = [];
+      for (i = center + 1; i < groups.length; i++) {
+        groups_desc2[i-center-1] = groups[i];
+      }
+      sort_groups(groups_cpy, groups_desc1, 0, center);
+      sort_groups(groups_cpy, groups_desc2, center+1, groups.length);
+    }
+    for (i = 0 ; i < groups_cpy.length; i++) {
+      groups_cpy[i].order = i;
+    }
+    return groups_cpy;
+  } // sort_groups_main
 
 
   // Called before link positions are determined
@@ -513,6 +709,27 @@ var Narrative = function() {
 
         links = generate_links(people, events);
         char_scenes = add_char_scenes(people, events, links, panel_shift);
+        groups = define_groups(people);
+
+        find_median_groups(groups, events, people, tie_breaker);
+
+
+        groups = sort_groups_main(groups, center_sort);
+        links = generate_links(people, events);
+        char_scenes = add_char_scenes(people, events, links, groups, 40);
+        // Determine the position of each character in each group
+        // (if it ever appears in the scenes that appear in that
+        // group)
+        groups.forEach(function(g) {
+          g.all_chars.sort(function(a, b) {
+            return a.group_ptr.order - b.group_ptr.order;
+          });
+          var y = g.min;
+          for (var i = 0; i < g.all_chars.length; i++) {
+            g.all_chars[i].group_positions[g.id] = y + i*(text_height);
+          }
+        });
+
         calculate_node_positions(people, scenes, total_panels,
              width, height, char_scenes, panel_width,
              panel_shift, char_map);
