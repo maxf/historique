@@ -14,11 +14,6 @@ var Narrative = function() {
     node_width = 10, // Set to panel_width later
     color = d3.scale.category10(),
 
-    // Height of empty gaps between groups
-    // (Sparse groups and group ordering already
-    // provide a lot of whitespace though.)
-    group_gap = 0,
-
     // This is used for more than just text height.
     text_height = 8,
 
@@ -46,14 +41,6 @@ var Narrative = function() {
     // of the chart. Can calculate but this works okay.
     longest_name = 115;
 
-    // True: When deciding on which group to put a scene in,
-    // if there's a tie, break the tie based on which
-    // groups the scenes from which the links are incoming
-    // are in
-    // False: Arbitrary
-    //  tie_breaker = false;
-    // Set for each comic separately
-
   // d3 function
   function get_path(link) {
     var x0 = link.x0,
@@ -70,12 +57,11 @@ var Narrative = function() {
   } // get_path
 
 
-  function Link(from, to, group, char_id) {
+  function Link(from, to, char_id) {
     // to and from are ids of scenes
     this.from = from;
     this.to = to;
     this.char_id = char_id;
-    this.group = group; // Group number
     this.x0 = 0;
     this.y0 = -1;
     this.x1 = 0;
@@ -112,9 +98,7 @@ var Narrative = function() {
     // are sorted separately. This is the index of the x-region.
     // ... Actually, I'll just keep an array of the nodes in every region.
     //this.x_region = 0;
-    this.median_group = null;
-//    this.comic_name;
-  } // SceneNode
+  }
 
   function reposition_node_links(scene_id, x, y, width, height, svg, ydisp, comic_name) {
     //console.log(d3.selectAll("[from=\"" + scene_id + "\"]"));
@@ -152,10 +136,8 @@ var Narrative = function() {
       char_scenes.sort(scene_cmp);
       chars[i].first_scene = char_scenes[0];
       for (j = 1; j < char_scenes.length; j++) {
-        links[links.length] = new Link(char_scenes[j-1], char_scenes[j],
-               chars[i].group, chars[i].id);
+        links[links.length] = new Link(char_scenes[j-1], char_scenes[j], chars[i].id);
         links[links.length-1].char_ptr = chars[i];
-        //console.log("char name = " + chars[i].name + ", group = " + chars[i].group);
         char_scenes[j-1].out_links[char_scenes[j-1].out_links.length] = links[links.length-1];
         char_scenes[j].in_links[char_scenes[j].in_links.length] = links[links.length-1];
         //console.log(char_scenes[j].in_links[char_scenes[j].in_links.length-1].y0);
@@ -164,201 +146,14 @@ var Narrative = function() {
     return links;
   } // generate_links
 
-  function Group() {
-    this.min = -1;
-    this.max = -1;
-    this.id = -1;
-    this.chars = [];
-    this.first_scene_chars = []; // NOT USED?
-    this.median_count = 0;
-    this.biggest_scene = 0; // largest scene height. NOT USED
-    this.all_chars = {};
-    this.char_scenes = [];
-    this.order = -1;
-  }
-
-  function sort_groups(groups_sorted, groups_desc, top, bottom) {
-    var i,m,t1,b1,t2,b2,g1,g2;
-    if (groups_desc.length === 2) {
-      groups_sorted[bottom] = groups_desc[0];
-      groups_sorted[top] = groups_desc[1];
-      return;
-    }
-    if (top >= bottom) {
-      if (groups_desc.length > 0) {
-        groups_sorted[top] = groups_desc[0];
-      }
-      return;
-    }
-    m = Math.floor((top + bottom)/2);
-    groups_sorted[m] = groups_desc[0];
-    t1 = top;
-    b1 = m-1;
-    t2 = m+1;
-    b2 = bottom;
-    g1 = [];
-    g2 = [];
-    // TODO: make more efficient
-    for (i = 1; i < groups_desc.length; i++) {
-      if (i % 2 === 0) {
-        g1[g1.length] = groups_desc[i];
-      } else {
-        g2[g2.length] = groups_desc[i];
-      }
-    } // for
-    sort_groups(groups_sorted, g1, t1, b1);
-    sort_groups(groups_sorted, g2, t2, b2);
-  } // sort_groups
-
-  function define_groups(chars) {
-    var groups = [];
-    chars.forEach(function(c) {
-      // Put char in group
-      var g,found_group = false;
-      groups.forEach(function(g) {
-        if (g.id === c.group) {
-          found_group = true;
-          g.chars[g.chars.length] = c;
-          c.group_ptr = g;
-        }
-      });
-      if (!found_group) {
-        g = new Group();
-        g.id = c.group;
-        g.chars[g.chars.length] = c;
-        c.group_ptr = g;
-        groups[groups.length] = g;
-      }
-    });
-    return groups;
-  }
-
-  function find_median_groups(groups, scenes, chars, char_map, tie_breaker) {
-    scenes.forEach(function(scene) {
-      var i, group_count, max_index;
-      if (!scene.char_node) {
-        group_count = [];
-        for (i = 0; i < groups.length; i++) {
-          group_count[i] = 0;
-        }
-        max_index = 0;
-        scene.chars.forEach(function(c) {
-          // TODO: Can just search group.chars
-          var i, score1, score2, group_index = find_group(chars, groups, c);
-          group_count[group_index] += 1;
-          if ( (!tie_breaker && group_count[group_index] >= group_count[max_index]) ||
-               (group_count[group_index] > group_count[max_index])) {
-            max_index = group_index;
-          } else {
-            if (group_count[group_index] === group_count[max_index]) {
-              // Tie-breaking
-              score1 = 0;
-              score2 = 0;
-              for (i = 0; i < scene.in_links.length; i++) {
-                if (scene.in_links[i].from.median_group !== null) {
-                  if (scene.in_links[i].from.median_group.id === groups[group_index].id) {
-                    score1 += 1;
-                  } else {
-                    if (scene.in_links[i].from.median_group.id === groups[max_index].id) {
-                      score2 += 1;
-                    }
-                  }
-                }
-              }
-              for (i = 0; i < scene.out_links.length; i++) {
-                if (scene.out_links[i].to.median_group !== null) {
-                  if (scene.out_links[i].to.median_group.id === groups[group_index].id) {
-                    score1 += 1;
-                  } else {
-                    if (scene.out_links[i].to.median_group.id === groups[max_index].id) {
-                      score2 += 1;
-                    }
-                  }
-                }
-              }
-              if (score1 > score2) {
-                max_index = group_index;
-              }
-            }
-          }
-        }); // for each char in scene
-        scene.median_group = groups[max_index];
-        groups[max_index].median_count += 1;
-        scene.chars.forEach(function(c) {
-          // This just puts this character in the set
-          // using sets to avoid duplicating characters
-          groups[max_index].all_chars[c] = true;
-        });
-      }
-    });
-    // Convert all the group char sets to regular arrays
-    groups.forEach(function(g) {
-      var c, chars_list = [];
-      for (c in g.all_chars) {
-        if (g.all_chars.hasOwnProperty(c)) {
-          chars_list.push(char_map[c]);
-        }
-      }
-      g.all_chars = chars_list;
-    });
-  }
-
-  function sort_groups_main(groups, center_sort) {
-    var groups_cpy = [], i, groups_desc, groups_desc1, groups_desc2, center;
-    groups.sort(function(a, b) {
-      return b.median_count - a.median_count;
-    });
-    for (i = 0; i < groups.length; i++) {
-      groups_cpy[i] = groups[i];
-    }
-    if (!center_sort) {
-      if (groups.length > 0) {
-        groups_cpy[0] = groups[0];
-      }
-      if (groups.length > 1) {
-        groups_cpy[groups.length-1] = groups[1];
-      }
-      if (groups.length > 2) {
-        groups_desc = [];
-        for (i = 0; i < groups.length - 2; i++) {
-          groups_desc[i] = groups[i+2];
-        }
-        // groups_cpy is the one that gets sorted
-        sort_groups(groups_cpy, groups_desc, 1, groups.length-2);
-      }
-    } else {
-      center = Math.floor(groups.length/2.0);
-      groups_cpy[center] = groups[0];
-      groups_desc1 = [];
-      for (i = 0; i < center; i++) {
-        groups_desc1[i] = groups[i];
-      }
-      groups_desc2 = [];
-      for (i = center + 1; i < groups.length; i++) {
-        groups_desc2[i-center-1] = groups[i];
-      }
-      sort_groups(groups_cpy, groups_desc1, 0, center);
-      sort_groups(groups_cpy, groups_desc2, center+1, groups.length);
-    }
-    for (i = 0 ; i < groups_cpy.length; i++) {
-      groups_cpy[i].order = i;
-    }
-    return groups_cpy;
-  } // sort_groups_main
 
 
   // Called before link positions are determined
-  function add_char_scenes(chars, scenes, links, groups, panel_shift, comic_name) {
+  function add_char_scenes(chars, scenes, links, panel_shift, comic_name) {
     // Shift starting times for the rest of the scenes panel_shift panels to the left
     var char_scenes = [];
     // Set y values
     var cury = 0;
-    groups.forEach(function(g) {
-      var height = g.all_chars.length*text_height;
-      g.min = cury;
-      g.max = g.min + height;
-      cury += height + group_gap;
-    });
     for (var i = 0; i < chars.length; i++) {
       var s = new SceneNode([chars[i].id], [0], [1]); // @@this probably doesn't work
       s.char_node = true;
@@ -371,7 +166,7 @@ var Narrative = function() {
       s.id = scenes.length;
       s.comic_name = comic_name;
       if (chars[i].first_scene !== undefined) {
-        var l = new Link(s, chars[i].first_scene, chars[i].group, chars[i].id);
+        var l = new Link(s, chars[i].first_scene, chars[i].id);
         l.char_ptr = chars[i];
         s.out_links[s.out_links.length] = l;
         chars[i].first_scene.in_links[chars[i].first_scene.in_links.length] = l;
@@ -379,39 +174,14 @@ var Narrative = function() {
         s.first_scene = chars[i].first_scene;
         scenes[scenes.length] = s;
         char_scenes[char_scenes.length] = s;
-        s.median_group = chars[i].first_scene.median_group;
       } // if
     } // for
     return char_scenes;
   } // add_char_scenes
 
-  // TODO: Use the char_map to eliminate this
-  function find_group(chars, groups, char_id) {
-    // Find the char's group id
-    var i;
-    for (i = 0; i < chars.length; i++) {
-      if (chars[i].id === char_id) {
-        break;
-      }
-    }
-    if (i === chars.length) {
-      console.log("ERROR: char not found, id = " + char_id);
-    }
-    // Find the corresponding group
-    var j;
-    for (j = 0; j < groups.length; j++) {
-      if (chars[i].group === groups[j].id) {
-        break;
-      }
-    }
-    if (j === groups.length) {
-      console.log("ERROR: groups not found.");
-    }
-    return j;
-  } // find_group
 
   function calculate_node_positions(chars, scenes, total_panels, chart_width,
-                                    chart_height, char_scenes, groups, panel_width,
+                                    chart_height, char_scenes, panel_width,
                                     panel_shift, char_map) {
     scenes.forEach(function(scene) {
       if (!scene.char_node) {
@@ -424,16 +194,9 @@ var Narrative = function() {
         var den2 = 0;
         for (var i = 0; i < scene.chars.length; i++) {
           var c = char_map[scene.chars[i]];
-          var y = c.group_positions[scene.median_group.id];
+          var y = ??;
           if (!y) {
             continue;
-          }
-          if (c.group.id === scene.median_group.id) {
-            sum1 += y;
-            den1 += 1;
-          } else {
-            sum2 += y;
-            den2 += 1;
           }
         }
         var avg;
@@ -446,7 +209,6 @@ var Narrative = function() {
           avg = sum1/den1;
         } else {
           console.log("ERROR: den1 and den2 are 0. Scene doesn't have characters?");
-          avg = scene.median_group.min;
         }
         scene.y = avg - scene.height/2.0;
         scene.x = scene.start;
@@ -467,21 +229,16 @@ var Narrative = function() {
   // The positions of the nodes have to be set before this is called
   // (The positions of the links are determined according to the positions
   // of the nodes they link.)
-  function calculate_link_positions(scenes, chars, groups) {
+  function calculate_link_positions(scenes, chars) {
     // Sort by x
     // Because the sorting of the in_links will depend on where the link
     // is coming from, so that needs to be calculated first
     //scenes.sort(function(a, b) { return a.x - b.x; });
-    // TODO:
-    // Actually, sort the in_links such that the sum of the distances
-    // between where a link is on the scene node and where its slot
-    // is in the group are minimized
     scenes.forEach(function(scene) {
       var i,j;
       // TODO: Sort the in_links here
-      // Use sort by group for now
-      scene.in_links.sort(function(a, b) { return a.char_ptr.group_ptr.order - b.char_ptr.group_ptr.order; });
-      scene.out_links.sort(function(a, b) { return a.char_ptr.group_ptr.order - b.char_ptr.group_ptr.order; });
+@@      scene.in_links.sort(function(a, b) { return a.char_ptr.group_ptr.order - b.char_ptr.group_ptr.order; });
+@@      scene.out_links.sort(function(a, b) { return a.char_ptr.group_ptr.order - b.char_ptr.group_ptr.order; });
 
       // We can't calculate the y positions of the in links in the same
       // way we do the out links, because some links come in but don't go
@@ -669,7 +426,7 @@ var Narrative = function() {
       .attr("from", function(d) { return d.from.comic_name + "_" + d.from.id; })
       .attr("to", function(d) { return d.to.comic_name + "_" +  d.to.id; })
       .attr("charid", function(d) { return d.from.comic_name + "_" + d.char_id; })
-      .style("stroke", function(d) { return d3.rgb(color(d.group)).darker(0.5).toString(); })
+      .style("stroke", function(d) { return d3.rgb(color("#fdd")).darker(0.5).toString(); }) @@ color def?
       .style("stroke-width", link_width)
             .style("stroke-opacity", "0.6")
             .style("stroke-linecap", "round")
@@ -729,7 +486,6 @@ var Narrative = function() {
         // are sorted separately. This is the index of the x-region.
         // ... Actually, I'll just keep an array of the nodes in every region.
         //this.x_region = 0;
-        events[i].median_group = null;
       }
 
 //      var panel_width = Math.min((width-longest_name)/total_panels, 15);
@@ -738,7 +494,7 @@ var Narrative = function() {
 //      panel_width = Math.min(width/total_panels, 15);
 
       d3.json("/events/api/person/", function(people) {
-        var svg, chars, char_map, groups, links, char_scenes, i;
+        var svg, chars, char_map, links, char_scenes, i;
         svg = d3
           .select("#chart")
           .append("svg")
@@ -749,36 +505,13 @@ var Narrative = function() {
           .append("g")
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         for (i = 0; i < people.length; i++) {
-          people[i].group = 0; // no group information in API, currently
-          people[i].group_ptr = null;
           people[i].first_scene = null;
-          people[i].group_positions = {};
-          people[i].group_name_positions = {};
         }
 
-        groups = define_groups(people);
-        console.log(groups)
-
-        find_median_groups(groups, events, people, char_map, tie_breaker);
-
-
-        groups = sort_groups_main(groups, center_sort);
         links = generate_links(people, events);
-        char_scenes = add_char_scenes(people, events, links, groups, panel_shift);
-        // Determine the position of each character in each group
-        // (if it ever appears in the scenes that appear in that
-        // group)
-        groups.forEach(function(g) {
-          g.all_chars.sort(function(a, b) {
-            return a.group_ptr.order - b.group_ptr.order;
-          });
-          var y = g.min;
-          for (var i = 0; i < g.all_chars.length; i++) {
-            g.all_chars[i].group_positions[g.id] = y + i*(text_height);
-          }
-        });
+        char_scenes = add_char_scenes(people, events, links, panel_shift);
         calculate_node_positions(people, scenes, total_panels,
-             width, height, char_scenes, groups, panel_width,
+             width, height, char_scenes, panel_width,
              panel_shift, char_map);
         scenes.forEach(function(s) {
           if (!s.char_node) {
@@ -808,26 +541,13 @@ var Narrative = function() {
         char_scenes.forEach(function(cs) {
           var character = char_map[cs.chars[0]];
           if (character.first_scene.x < per_width*width) {
-            // The median group of the first scene in which the character appears
-            // We want the character's name to appear in that group
-            var first_group = character.first_scene.median_group;
-            cs.y = character.group_positions[first_group.id];
+            cs.y = character.group_positions[@@];
           }
         });
-        calculate_link_positions(events, people, groups, char_map);
-        height = groups[groups.length-1].max + group_gap*5;
+        calculate_link_positions(events, people, char_map);
+@@        height = groups[groups.length-1].max + group_gap*5;
         raw_chart_height = height + margin.top + margin.bottom;
         d3.select('svg#timeline').style("height", raw_chart_height);
-        /*
-        groups.forEach(function(g) {
-          d3.select("svg#" + folder).append("rect")
-        .attr("width", 10)
-        .attr("height", g.max-g.min)
-        .attr("x", 0)
-        .attr("y", g.min+margin.top)
-        .style("color", color(g.id));
-        });
-        */
         draw_links(links, svg);
         draw_nodes(events, svg, width, height, raw_chart_height);
       }); // d3.xml (read chars)
