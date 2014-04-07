@@ -4,6 +4,9 @@ var Narrative = function() {
   "use strict";
   // Link dimensions
   var
+    chart_width = 500,
+    chart_height = 1500,
+
 
     raw_chart_width = 1000,
     raw_chart_height = 360,
@@ -553,6 +556,67 @@ var Narrative = function() {
       }); // d3.xml (read chars)
     }); // d3.json (read scenes)
   };
+
+  this.draw_chart2 = function() {
+    var svg;
+    svg = d3
+      .select("#chart")
+      .append("svg")
+      .attr("width", chart_width)
+      .attr("height", chart_height)
+      .attr("id", "timeline")
+      .append("g");
+
+    d3.json("/events/api/event/", function(events) {
+      d3.json("/events/api/person/", function(people) {
+        var i, j, event, person, sum_canonical_x, min_date, max_date, event_date_range;
+        events.sort(function(e1,e2) { return e1.date > e2.date; }); // don't assume they come in a specific order
+
+        for (i = 0; i < events.length; i++) {
+          events[i].dateInt = dateToInt(events[i].date);
+          min_date = Math.min(min_date, events[i].dateInt);
+          max_date = Math.max(max_date, events[i].dateInt);
+        }
+        event_date_range = max_date - min_date;
+
+        for (i=0;i<events.length;i++) {
+          event = events[i];
+          event.people.sort(function(p1,p2) { return p1.id > p2.id; });
+          for (j=0;j<people.length;j++) {
+            people[i].canonical_x = chart_width * (j+1) / people.length; // this is used to compute an event's X
+          }
+          
+          // we compute an event's X by averaging the canonical_x of its participants
+          sum_canonical_x = 0;
+          for (j=0; j<event.people.length; j++) {
+            sum_canonical_x += event.people[j].canonical_x;
+          }
+          event.x = sum_canonical_x / event.people.length;
+          event.y = event.dateInt * chart_height / event_date_range;
+          event.rx = 50*event.people.length;
+          event.ry = 50;
+
+          event.cx = event.x + event.rx / 2;
+          event.cy = event.y + event.ry / 2;
+  
+          svg
+            .append("ellipse")
+            .attr("cx", event.cx)
+            .attr("cy", event.cy)
+            .attr("rx", event.rx)
+            .attr("ry", event.ry)
+            .attr("class", "event");
+        }  
+    
+        // draw each event in the timeline
+        // an event is an ellipse
+  
+        // when an event is drawn, for each participant, we can draw the path to that participant's previous event.
+  
+  
+        // add control to select 1 person. Their paths become straight lines, by aligning the person's events in the centre
+      });
+    });
 };
 
 var n=new Narrative();
