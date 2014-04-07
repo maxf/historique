@@ -97,7 +97,7 @@ var Narrative = function() {
     this.in_links = [];
     this.out_links = [];
     this.name = "";
-    this.has_char = function(id) {
+    this.has_person = function(id) {
       for (var i = 0; i < this.chars.length; i++) {
         if (id === this.chars[i]) {
           return true;
@@ -138,27 +138,27 @@ var Narrative = function() {
       .attr("d", function(d) { return get_path(d); });
   } // reposition_link_nodes
 
-  function generate_links(chars, scenes) {
-    var i,j,links = [], char_scenes;
+  function generate_links(people, events) {
+    var i,j,links=[],person_events;
     function scene_cmp(a,b) { return a.start-b.start; }
-    for (i = 0; i < chars.length; i++) {
-      // The scenes in which the character appears
-      char_scenes = [];
-      for (j = 0; j < scenes.length; j++) {
-        if (scenes[j].has_char(chars[i].id)) {
-          char_scenes[char_scenes.length] = scenes[j];
+    for (i = 0; i < people.length; i++) {
+      // The events in which the person appears
+      person_events = [];
+      for (j = 0; j < events.length; j++) {
+        if (events[j].has_person(people[i].id)) {
+          person_events[person_events.length] = events[j];
         }
       }
-      char_scenes.sort(scene_cmp);
-      chars[i].first_scene = char_scenes[0];
-      for (j = 1; j < char_scenes.length; j++) {
-        links[links.length] = new Link(char_scenes[j-1], char_scenes[j],
-               chars[i].group, chars[i].id);
-        links[links.length-1].char_ptr = chars[i];
-        //console.log("char name = " + chars[i].name + ", group = " + chars[i].group);
-        char_scenes[j-1].out_links[char_scenes[j-1].out_links.length] = links[links.length-1];
-        char_scenes[j].in_links[char_scenes[j].in_links.length] = links[links.length-1];
-        //console.log(char_scenes[j].in_links[char_scenes[j].in_links.length-1].y0);
+      person_events.sort(scene_cmp);
+      people[i].first_scene = person_events[0];
+      for (j = 1; j < person_events.length; j++) {
+        links[links.length] = new Link(person_events[j-1], person_events[j],
+               people[i].group, people[i].id);
+        links[links.length-1].char_ptr = people[i];
+        //console.log("char name = " + people[i].name + ", group = " + people[i].group);
+        person_events[j-1].out_links[person_events[j-1].out_links.length] = links[links.length-1];
+        person_events[j].in_links[person_events[j].in_links.length] = links[links.length-1];
+        //console.log(person_events[j].in_links[person_events[j].in_links.length-1].y0);
       }
     } // for
     return links;
@@ -233,18 +233,20 @@ var Narrative = function() {
     return groups;
   }
 
-  function find_median_groups(groups, scenes, chars, char_map, tie_breaker) {
-    scenes.forEach(function(scene) {
+  // for each event, find its median group
+  function find_median_groups(groups, events, people, tie_breaker) {
+    events.forEach(function(event) {
       var i, group_count, max_index;
-      if (!scene.char_node) {
+      if (!event.char_node) {
         group_count = [];
         for (i = 0; i < groups.length; i++) {
           group_count[i] = 0;
         }
         max_index = 0;
-        scene.chars.forEach(function(c) {
-          // TODO: Can just search group.chars
-          var i, score1, score2, group_index = find_group(chars, groups, c);
+        event.people.forEach(function(person) {
+          // TODO: Can just search group.people
+//          var i, score1, score2, group_index = find_group(people, groups, c);
+          var i, score1, score2, group_index = 0;
           group_count[group_index] += 1;
           if ( (!tie_breaker && group_count[group_index] >= group_count[max_index]) ||
                (group_count[group_index] > group_count[max_index])) {
@@ -254,23 +256,23 @@ var Narrative = function() {
               // Tie-breaking
               score1 = 0;
               score2 = 0;
-              for (i = 0; i < scene.in_links.length; i++) {
-                if (scene.in_links[i].from.median_group !== null) {
-                  if (scene.in_links[i].from.median_group.id === groups[group_index].id) {
+              for (i = 0; i < event.in_links.length; i++) {
+                if (event.in_links[i].from.median_group !== null) {
+                  if (event.in_links[i].from.median_group.id === groups[group_index].id) {
                     score1 += 1;
                   } else {
-                    if (scene.in_links[i].from.median_group.id === groups[max_index].id) {
+                    if (event.in_links[i].from.median_group.id === groups[max_index].id) {
                       score2 += 1;
                     }
                   }
                 }
               }
-              for (i = 0; i < scene.out_links.length; i++) {
-                if (scene.out_links[i].to.median_group !== null) {
-                  if (scene.out_links[i].to.median_group.id === groups[group_index].id) {
+              for (i = 0; i < event.out_links.length; i++) {
+                if (event.out_links[i].to.median_group !== null) {
+                  if (event.out_links[i].to.median_group.id === groups[group_index].id) {
                     score1 += 1;
                   } else {
-                    if (scene.out_links[i].to.median_group.id === groups[max_index].id) {
+                    if (event.out_links[i].to.median_group.id === groups[max_index].id) {
                       score2 += 1;
                     }
                   }
@@ -281,10 +283,10 @@ var Narrative = function() {
               }
             }
           }
-        }); // for each char in scene
-        scene.median_group = groups[max_index];
+        });
+        event.median_group = groups[max_index];
         groups[max_index].median_count += 1;
-        scene.chars.forEach(function(c) {
+        event.people.forEach(function(c) {
           // This just puts this character in the set
           // using sets to avoid duplicating characters
           groups[max_index].all_chars[c] = true;
@@ -292,15 +294,16 @@ var Narrative = function() {
       }
     });
     // Convert all the group char sets to regular arrays
-    groups.forEach(function(g) {
+    groups.forEach(function(group) {
       var c, chars_list = [];
-      for (c in g.all_chars) {
-        if (g.all_chars.hasOwnProperty(c)) {
-          chars_list.push(char_map[c]);
+      for (c in group.all_chars) {
+        if (group.all_chars.hasOwnProperty(c)) {
+          chars_list.push(people[c]);
         }
       }
-      g.all_chars = chars_list;
+      group.all_chars = chars_list;
     });
+    console.log(groups);
   }
 
   function sort_groups_main(groups, center_sort) {
@@ -386,29 +389,29 @@ var Narrative = function() {
   } // add_char_scenes
 
   // TODO: Use the char_map to eliminate this
-  function find_group(chars, groups, char_id) {
-    // Find the char's group id
-    var i;
-    for (i = 0; i < chars.length; i++) {
-      if (chars[i].id === char_id) {
-        break;
-      }
-    }
-    if (i === chars.length) {
-      console.log("ERROR: char not found, id = " + char_id);
-    }
-    // Find the corresponding group
-    var j;
-    for (j = 0; j < groups.length; j++) {
-      if (chars[i].group === groups[j].id) {
-        break;
-      }
-    }
-    if (j === groups.length) {
-      console.log("ERROR: groups not found.");
-    }
-    return j;
-  } // find_group
+//  function find_group(chars, groups, char_id) {
+//    // Find the char's group id
+//    var i;
+//    for (i = 0; i < chars.length; i++) {
+//      if (chars[i].id === char_id) {
+//        break;
+//      }
+//    }
+//    if (i === chars.length) {
+//      console.log("ERROR: char not found, id = " + char_id);
+//    }
+//    // Find the corresponding group
+//    var j;
+//    for (j = 0; j < groups.length; j++) {
+//      if (chars[i].group === groups[j].id) {
+//        break;
+//      }
+//    }
+//    if (j === groups.length) {
+//      console.log("ERROR: groups not found.");
+//    }
+//    return j;
+//  } // find_group
 
   function calculate_node_positions(chars, scenes, total_panels, chart_width,
                                     chart_height, char_scenes, groups, panel_width,
@@ -738,7 +741,7 @@ var Narrative = function() {
 //      panel_width = Math.min(width/total_panels, 15);
 
       d3.json("/events/api/person/", function(people) {
-        var svg, chars, char_map, groups, links, char_scenes, i;
+        var svg, chars, groups, links, char_scenes, i;
         svg = d3
           .select("#chart")
           .append("svg")
@@ -757,14 +760,13 @@ var Narrative = function() {
         }
 
         groups = define_groups(people);
-        console.log(groups)
 
-        find_median_groups(groups, events, people, char_map, tie_breaker);
+        find_median_groups(groups, events, people, tie_breaker);
 
 
         groups = sort_groups_main(groups, center_sort);
         links = generate_links(people, events);
-        char_scenes = add_char_scenes(people, events, links, groups, panel_shift);
+        char_scenes = add_char_scenes(people, events, links, groups, 40);
         // Determine the position of each character in each group
         // (if it ever appears in the scenes that appear in that
         // group)
