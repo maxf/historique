@@ -5,8 +5,8 @@ var Narrative = function() {
 
   var
     chart_width = 1000,
-    chart_height = 1500;
-
+    chart_height = 1500,
+    margin = 20;
 
   // The API returns dates as 2013-03-21. We need to map that to time axis interval [min(date), max(date)]
   function dateToInt(date_string) {
@@ -791,6 +791,7 @@ var Narrative = function() {
     svg = d3
       .select("#chart")
       .append("svg")
+      .attr("viewBox", "-"+margin+" -"+margin+" "+(chart_width+2*margin)+" "+(chart_height+2*margin))
       .attr("width", chart_width)
       .attr("height", chart_height)
       .attr("id", "timeline")
