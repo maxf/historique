@@ -5,7 +5,7 @@ var Narrative = function() {
 
   var
     chart_width = 1000,
-    chart_height = 1500,
+    chart_height = 10000,
     margin = 20;
 
   // The API returns dates as 2013-03-21. We need to map that to time axis interval [min(date), max(date)]
@@ -779,11 +779,31 @@ var Narrative = function() {
   function find_person_by_id(people, id) {
     var i;
     for (i=0;i<people.length;i++) {
-      if (people[i].id === id) {
+      if (people[i].id == id) {
         return people[i];
       }
     }
     return undefined;
+  }
+
+  function find_event_by_id(events, id) {
+    var i;
+    for (i=0;i<events.length;i++) {
+      if (events[i].id == id) {
+        return events[i];
+      }
+    }
+    return undefined;
+  }
+
+  function event_popup(event, svg_context) {
+    svg_context
+      .append("rect")
+      .attr("x",event.x)
+      .attr("y",event.y)
+      .attr("width",20)
+      .attr("height",20)
+      .attr("class", "event_tooltip");
   }
 
   this.draw_chart = function() {
@@ -799,7 +819,7 @@ var Narrative = function() {
 
     d3.json("/events/api/event/", function(events) {
       d3.json("/events/api/person/", function(people) {
-        var i, j, event, sum_standard_x, min_date, max_date, event_date_range;
+        var i, j, k, l, event_person, event, person, sum_standard_x, min_date, max_date, event_date_range, previous_event;
         events.sort(function(e1,e2) { return e1.date > e2.date; }); // don't assume they come in a specific order
 
         min_date=9999999999999; max_date=0;
@@ -837,11 +857,33 @@ var Narrative = function() {
             .attr("cy", event.cy)
             .attr("rx", event.rx)
             .attr("ry", event.ry)
-            .attr("class", "event");
-        }  
-    
-        
+            .attr("class", "event")
+            .attr("id","event-"+event.id);
+//            .on("click", function(e) { event_popup(find_event_by_id(events,this.id.split('-')[1]), svg); });
 
+          svg
+            .append("text")
+            .attr("x", event.x)
+            .attr("y", event.y)
+            .attr("text-anchor", "end")
+            .attr("class", "event-text")
+            .text(event.title);
+
+          // connect this event to previous event with participants' paths
+          for (k=0; k<event.people.length; k++) {
+            event_person = find_person_by_id(people, event.people[k].id);
+
+            // for that person we need to find the previous event they were part of and draw a line to it
+            // if none, this is the person's first event, just show their name
+            for (l=i-1; i>=0; i--) {
+              previous_event = events[l];
+              // look for our person in the previous event
+              if (person_is_in_event(person, event)) {
+                // trace a line to that event
+              }
+            }
+          }
+        }
       });
     });
   };

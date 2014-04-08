@@ -4,3 +4,11 @@
   opacity: 0.4;
 }
 
+.event-text {
+  fill: black;
+  font-family: sans-serif;
+}
+
+.event_tooltip {
+  fill: #fc3;
+}
