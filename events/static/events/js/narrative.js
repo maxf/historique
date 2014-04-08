@@ -5,13 +5,24 @@ var Narrative = function() {
 
   var
     chart_width = 1000,
-    chart_height = 10000,
-    margin = 20;
+    chart_height = 2000,
+    margin = 20,
+    curvature = 0.5;
 
   // The API returns dates as 2013-03-21. We need to map that to time axis interval [min(date), max(date)]
   function dateToInt(date_string) {
     var date = date_string.split('-',3);
     return new Date(date[0],date[1],date[2]).getTime();
+  }
+
+  function get_path(x0,y0,x1,y1) {
+    var yi = d3.interpolateNumber(y0, y1),
+        y2 = yi(curvature),
+        y3 = yi(1 - curvature);
+    return "M" + x0 + "," + y0 +
+           "C" + x0 + "," + y2 +
+           " " + x1 + "," + y3 +
+           " " + x1 + "," + y1;
   }
 
 
@@ -40,8 +51,6 @@ var Narrative = function() {
 //    // True: Use a white background for names
 //    name_bg = true,
 //
-//    // Between 0 and 1.
-//    curvature = 0.5,
 //
 //    // Scene width in panel_width
 //    // i.e. scene width = panel_width*sw_panels
@@ -52,19 +61,6 @@ var Narrative = function() {
 //    longest_name = 115;
 //
 //  // d3 function
-//  function get_path(link) {
-//    var x0 = link.x0,
-//        x1 = link.x1,
-//        xi = d3.interpolateNumber(x0, x1),
-//        x2 = xi(curvature),
-//        x3 = xi(1 - curvature),
-//        y0 = link.y0,
-//        y1 = link.y1;
-//    return "M" + x0 + "," + y0 +
-//           "C" + x2 + "," + y0 +
-//           " " + x3 + "," + y1 +
-//           " " + x1 + "," + y1;
-//  } // get_path
 //
 //
 //  function Link(from, to, char_id) {
@@ -776,6 +772,16 @@ var Narrative = function() {
 //    }); // d3.json (read scenes)
 //  };
 
+  function index_person_in_event(person, event) {
+    var i;
+    for (i=0; i<event.people.length; i++) {
+      if (event.people[i].id == person.id) {
+        return i;
+      }
+    }
+    return false;
+  }
+
   function find_person_by_id(people, id) {
     var i;
     for (i=0;i<people.length;i++) {
@@ -819,7 +825,7 @@ var Narrative = function() {
 
     d3.json("/events/api/event/", function(events) {
       d3.json("/events/api/person/", function(people) {
-        var i, j, k, l, event_person, event, person, sum_standard_x, min_date, max_date, event_date_range, previous_event;
+        var i, j, event, person, sum_default_x, min_date, max_date, event_date_range, previous_event, idx, prevx, thisx, previdx;
         events.sort(function(e1,e2) { return e1.date > e2.date; }); // don't assume they come in a specific order
 
         min_date=9999999999999; max_date=0;
@@ -830,27 +836,27 @@ var Narrative = function() {
         }
         event_date_range = max_date - min_date;
 
+        // a person's default_x is that person's default position on the chart
+        for (j=0;j<people.length;j++) {
+          people[j].default_x = chart_width * (j+1) / (people.length+1);
+        }
+
         function person_id_cmp(p1,p2) { return p1.id > p2.id; }
         for (i=0;i<events.length;i++) {
           event = events[i];
           event.people.sort(person_id_cmp);
-          for (j=0;j<people.length;j++) {
-            people[j].standard_x = chart_width * (j+1) / (people.length+1); // this is used to compute an event's X
-          }
-          
-          // we compute an event's X by averaging the standard_x of its participants
-          sum_standard_x = 0;
+
+          // we compute an event's X by averaging the default_x of its participants
+          sum_default_x = 0;
           for (j=0; j<event.people.length; j++) {
-            sum_standard_x += find_person_by_id(people, event.people[j].id).standard_x;
+            sum_default_x += find_person_by_id(people, event.people[j].id).default_x;
           }
-          event.x = sum_standard_x / event.people.length;
-          event.y = (event.dateInt - min_date) * chart_height / event_date_range;
-          event.rx = 10*event.people.length;
+
+          event.cx = sum_default_x / event.people.length;
+          event.cy = (event.dateInt - min_date) * chart_height / event_date_range;
+          event.rx = 10*(event.people.length + 1);
           event.ry = 10;
 
-          event.cx = event.x + event.rx / 2;
-          event.cy = event.y + event.ry / 2;
-  
           svg
             .append("ellipse")
             .attr("cx", event.cx)
@@ -868,19 +874,26 @@ var Narrative = function() {
             .attr("text-anchor", "end")
             .attr("class", "event-text")
             .text(event.title);
+        }
 
-          // connect this event to previous event with participants' paths
-          for (k=0; k<event.people.length; k++) {
-            event_person = find_person_by_id(people, event.people[k].id);
-
-            // for that person we need to find the previous event they were part of and draw a line to it
-            // if none, this is the person's first event, just show their name
-            for (l=i-1; i>=0; i--) {
-              previous_event = events[l];
-              // look for our person in the previous event
-              if (person_is_in_event(person, event)) {
-                // trace a line to that event
-              }
+        // Trace each person's timeline
+        for (i=0; i<people.length; i++) {
+          person = people[i];
+          for (j=0; j<events.length; j++) {
+             event = events[j];
+             idx = index_person_in_event(person, event);
+             if (idx) {
+               if (previous_event) {
+                 // trace person's line from event to previous_event
+                 prevx = previous_event.cx - previous_event.rx/2 + previdx*10;
+                 thisx = event.cx - event.rx/2 + idx*10;
+                 svg
+                   .append("path")
+                   .attr("d", get_path(prevx, previous_event.cy, thisx, event.cy))
+                   .attr("class", "person");
+               }
+               previous_event = event;
+               previdx = idx;
             }
           }
         }
