@@ -779,7 +779,7 @@ var Narrative = function() {
         return i;
       }
     }
-    return false;
+    return -1;
   }
 
   function find_person_by_id(people, id) {
@@ -869,8 +869,8 @@ var Narrative = function() {
 
           svg
             .append("text")
-            .attr("x", event.x)
-            .attr("y", event.y)
+            .attr("x", event.cx)
+            .attr("y", event.cy)
             .attr("text-anchor", "end")
             .attr("class", "event-text")
             .text(event.title);
@@ -878,12 +878,16 @@ var Narrative = function() {
 
         // Trace each person's timeline
         for (i=0; i<people.length; i++) {
-          person = people[i];
+          person = people[i];          
+
+          previous_event = null;
           for (j=0; j<events.length; j++) {
              event = events[j];
              idx = index_person_in_event(person, event);
-             if (idx) {
+             if (idx !== -1) {
+               console.log(person.name, event.title);
                if (previous_event) {
+                 console.log("not the first");
                  // trace person's line from event to previous_event
                  prevx = previous_event.cx - previous_event.rx/2 + previdx*10;
                  thisx = event.cx - event.rx/2 + idx*10;
