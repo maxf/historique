@@ -7,7 +7,9 @@ var Narrative = function() {
     chart_width = 1000,
     chart_height = 2000,
     margin = 20,
-    curvature = 0.5;
+    curvature = 0.5,
+    color = d3.scale.category20(),
+    people_spacing_in_event = 20;
 
   // The API returns dates as 2013-03-21. We need to map that to time axis interval [min(date), max(date)]
   function dateToInt(date_string) {
@@ -887,14 +889,25 @@ var Narrative = function() {
              if (idx !== -1) {
                console.log(person.name, event.title);
                if (previous_event) {
-                 console.log("not the first");
                  // trace person's line from event to previous_event
-                 prevx = previous_event.cx - previous_event.rx/2 + previdx*10;
-                 thisx = event.cx - event.rx/2 + idx*10;
+                 prevx = previous_event.cx - previous_event.rx/2 + previdx*people_spacing_in_event;
+                 thisx = event.cx - event.rx/2 + idx*people_spacing_in_event;
                  svg
                    .append("path")
                    .attr("d", get_path(prevx, previous_event.cy, thisx, event.cy))
-                   .attr("class", "person");
+                   .attr("class", "person")
+                   .style("stroke", function(d) { return d3.rgb(color(person.id)).darker(0.5).toString(); });
+
+               } else {
+                 // the person's first event - write their name
+                 thisx = event.cx - event.rx/2 + idx*people_spacing_in_event;
+                 svg
+                   .append("text")
+                   .attr("transform", "translate("+thisx+","+event.cy+") rotate(-45)")
+                   .attr("text-anchor","start")
+                   .attr("class", "person-text")
+                   .style("fill", function(d) { return d3.rgb(color(person.id)).darker(0.5).toString(); })
+                   .text(person.name);
                }
                previous_event = event;
                previdx = idx;
