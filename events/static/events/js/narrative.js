@@ -6,7 +6,7 @@ var Narrative = function() {
   var
     chart_width = 1000,
     chart_height = 2000,
-    margin = 20,
+    margin = 50,
     curvature = 0.5,
     color = d3.scale.category20(),
     people_spacing_in_event = 20;
@@ -67,6 +67,15 @@ var Narrative = function() {
       .attr("class", "event_tooltip");
   }
 
+
+  function abbreviate(text,max_length) {
+    if (text.length < max_length) {
+      return text;
+    } else {
+      return text.substr(0,max_length-2)+"…";
+    }
+  }
+
   this.draw_chart = function() {
     var svg;
     svg = d3
@@ -124,11 +133,11 @@ var Narrative = function() {
 
           svg
             .append("text")
-            .attr("x", event.cx)
-            .attr("y", event.cy)
+            .attr("x", event.cx-event.rx/2)
+            .attr("y", event.cy+20)
             .attr("text-anchor", "end")
             .attr("class", "event-text")
-            .text(event.title);
+            .text(abbreviate(event.title,20));
         }
 
         // Trace each person's timeline
