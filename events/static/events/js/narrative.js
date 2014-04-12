@@ -4,7 +4,7 @@ var Narrative = function() {
   "use strict";
 
   var
-    chart_width, // proportional to number of people, so set later
+    chart_width = 800,
     chart_height = 2000,
     margin = 50,
     curvature = 0.3,
@@ -81,8 +81,7 @@ var Narrative = function() {
 
     d3.json("/events/api/event/", function(events) {
       d3.json("/events/api/person/", function(people) {
-        var i, j, event, person, sum_default_x, min_date, max_date, event_date_range, previous_event, idx, prevx, thisx, previdx;
-        chart_width = 50*people.length;
+        var i, j, event, person, sum_default_x, min_date, max_date, event_date_range, previous_event, idx, prevx, thisx, previdx, timescale, yAxis;
         
         svg = d3
           .select("#chart")
@@ -93,10 +92,20 @@ var Narrative = function() {
           .attr("id", "timeline")
           .append("g");
 
-
-
         events.sort(function(e1,e2) { return e1.date > e2.date; }); // don't assume they come in a specific order
 
+        // draw time axis
+        timescale = d3.time.scale()
+              .domain([new Date(events[0].date), new Date(events[events.length-1].date)])
+              .range([0,chart_height]);
+        yAxis = d3.svg.axis()
+              .scale(timescale)
+              .orient('left');
+        svg.append("g")
+          .attr('class', 'axis')
+          .call(yAxis);
+
+        // time calculations (todo: use timescale)
         min_date=9999999999999; max_date=0;
         for (i = 0; i < events.length; i++) {
           events[i].dateInt = dateToInt(events[i].date);
@@ -105,9 +114,10 @@ var Narrative = function() {
         }
         event_date_range = max_date - min_date;
 
+
         // a person's default_x is that person's default position on the chart
         for (j=0;j<people.length;j++) {
-          people[j].default_x = chart_width * (j+1) / (people.length+1);
+          people[j].default_x = chart_width * (j+1) / (people.length+1); // todo: use d3.scale.ordinal
         }
 
         function person_id_cmp(p1,p2) { return p1.id > p2.id; }
@@ -147,7 +157,6 @@ var Narrative = function() {
              event = events[j];
              idx = index_person_in_event(person, event);
              if (idx !== -1) {
-               console.log(person.name, event.title);
                if (previous_event) {
                  // trace person's line from event to previous_event
                  prevx = previous_event.cx - previous_event.rx/2 + previdx*people_spacing_in_event;

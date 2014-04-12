@@ -4,6 +4,17 @@
   opacity: 0.4;
 }
 
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+
 .event-text {
   fill: black;
   font-family: sans-serif;
