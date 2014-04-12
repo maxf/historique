@@ -4,10 +4,10 @@ var Narrative = function() {
   "use strict";
 
   var
-    chart_width = 1000,
+    chart_width, // proportional to number of people, so set later
     chart_height = 2000,
     margin = 50,
-    curvature = 0.5,
+    curvature = 0.3,
     color = d3.scale.category20(),
     people_spacing_in_event = 20;
 
@@ -78,18 +78,23 @@ var Narrative = function() {
 
   this.draw_chart = function() {
     var svg;
-    svg = d3
-      .select("#chart")
-      .append("svg")
-      .attr("viewBox", "-"+margin+" -"+margin+" "+(chart_width+2*margin)+" "+(chart_height+2*margin))
-      .attr("width", chart_width)
-      .attr("height", chart_height)
-      .attr("id", "timeline")
-      .append("g");
 
     d3.json("/events/api/event/", function(events) {
       d3.json("/events/api/person/", function(people) {
         var i, j, event, person, sum_default_x, min_date, max_date, event_date_range, previous_event, idx, prevx, thisx, previdx;
+        chart_width = 50*people.length;
+        
+        svg = d3
+          .select("#chart")
+          .append("svg")
+          .attr("viewBox", "-"+margin+" -"+margin+" "+(chart_width+2*margin)+" "+(chart_height+2*margin))
+          .attr("width", chart_width)
+          .attr("height", chart_height)
+          .attr("id", "timeline")
+          .append("g");
+
+
+
         events.sort(function(e1,e2) { return e1.date > e2.date; }); // don't assume they come in a specific order
 
         min_date=9999999999999; max_date=0;
@@ -131,13 +136,6 @@ var Narrative = function() {
             .attr("id","event-"+event.id);
 //            .on("click", function(e) { event_popup(find_event_by_id(events,this.id.split('-')[1]), svg); });
 
-          svg
-            .append("text")
-            .attr("x", event.cx-event.rx/2)
-            .attr("y", event.cy+20)
-            .attr("text-anchor", "end")
-            .attr("class", "event-text")
-            .text(abbreviate(event.title,20));
         }
 
         // Trace each person's timeline
@@ -176,6 +174,20 @@ var Narrative = function() {
             }
           }
         }
+
+        // text labels 
+        for (i=0;i<events.length;i++) {
+          event = events[i];
+          svg
+            .append("text")
+            .attr("x", event.cx-event.rx/2)
+            .attr("y", event.cy+20)
+            .attr("text-anchor", "end")
+            .attr("class", "event-text")
+            .text(abbreviate(event.title,20));
+        }
+
+
       });
     });
   };
