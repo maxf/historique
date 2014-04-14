@@ -31,4 +31,5 @@
   fill-opacity: 0;
   stroke-width: 10;
   z-index: 3;
+  stroke-linecap: round;
 }
