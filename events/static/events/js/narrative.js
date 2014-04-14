@@ -11,7 +11,8 @@ var Narrative = function() {
     margin = 50,
     curvature = 0.3,
     color = d3.scale.category20(),
-    people_spacing_in_event = 20;
+    people_spacing_in_event = 20,
+    min_date, max_date;
 
   // The API returns dates as 2013-03-21. We need to map that to time axis interval [min(date), max(date)]
   function dateToInt(date_string) {
@@ -49,7 +50,7 @@ var Narrative = function() {
     return undefined;
   }
 
-  function find_event_by_id(events, id) {
+  function find_event_by_id(id) {
     var i;
     for (i=0;i<events.length;i++) {
       if (events[i].id == id) {
@@ -59,36 +60,47 @@ var Narrative = function() {
     return undefined;
   }
 
-  function event_popup(event) {
-    svg
-      .append("rect")
-      .attr("x",event.x)
-      .attr("y",event.y)
-      .attr("width",20)
-      .attr("height",20)
-      .attr("class", "event_tooltip");
-  }
 
-  function person_popup(person_id, mouse) {
-    var person, popup;
-    person = find_person_by_id(person_id);
+  function popup_text(text, x,y) {
+    var popup, dummy_text_node;
     popup = svg
       .append("g")
       .on("mouseout", function() { this.remove(); });
+    // this text node is only created to get its bounding box and will be discarded later
+    dummy_text_node = popup
+      .append("text")
+      .attr("x",x)
+      .attr("y",y)
+      .attr("font-family","sans-serif")
+      .attr("font-size",20)
+      .text(text);
     popup
       .append("rect")
-      .attr("x",mouse[0]-8)
-      .attr("y",mouse[1]-30)
-      .attr("width",12*person.name.length)
+      .attr("x",x-10)
+      .attr("y",y-25)
+      .attr("width",dummy_text_node[0][0].getBBox().width+20)
       .attr("height",40)
       .attr("class", "event_tooltip");
     popup
       .append("text")
-      .attr("x",mouse[0])
-      .attr("y",mouse[1])
+      .attr("x",x)
+      .attr("y",y)
       .attr("font-family","sans-serif")
       .attr("font-size",20)
-      .text(person.name);
+      .text(text);
+    dummy_text_node.remove();
+  }
+
+  function event_popup(event_id, mouse) {
+    var event;
+    event = find_event_by_id(event_id);
+    popup_text(event.title, mouse[0], mouse[1]);
+  }
+
+  function person_popup(person_id, mouse) {
+    var person;
+    person = find_person_by_id(person_id);
+    popup_text(person.name, mouse[0], mouse[1]);
   }
 
   function abbreviate(text,max_length) {
@@ -99,11 +111,106 @@ var Narrative = function() {
     }
   }
 
+  function calc_people_chart_data() {
+    var person, event, previous_event, i, j, idx, previdx, thisx, prevx;
+    // Trace each person's timeline
+    for (i=0; i<people.length; i++) {
+      person = people[i];          
+      previous_event = null;
+      person.path = "";
+      for (j=0; j<events.length; j++) {
+        event = events[j];
+        idx = index_person_in_event(person, event);
+        if (idx !== -1) {
+          if (previous_event) {
+            // trace person's line from event to previous_event
+            prevx = previous_event.cx - previous_event.rx/2 + previdx*people_spacing_in_event;
+            thisx = event.cx - event.rx/2 + idx*people_spacing_in_event;
+            person.path += get_path(prevx, previous_event.cy, thisx, event.cy);
+          } else {
+            // the person's first event - write their name
+            person.name_pos = {
+              x: event.cx - event.rx/2 + idx*people_spacing_in_event, 
+              y: event.cy
+            };
+          }
+          previous_event = event;
+          previdx = idx;
+        }
+      }
+      person.color = d3.rgb(color(person.id)).darker(0.5).toString();
+    }
+  }
+
+  function draw_people() {
+    var i, person;
+    for (i=0; i<people.length; i++) {
+      person = people[i];
+      svg
+        .append("path")
+        .attr("d", person.path)
+        .attr("class", "person-path")
+        .attr("id", "P"+person.id)
+        .style("stroke", person.color)
+        .on("click", function() { person_popup(this.id.substr(1), d3.mouse(this)); });
+    }
+    // separate loop because we want to see all text in front
+    for (i=0; i<people.length; i++) {
+      person = people[i];
+      svg
+        .append("text")
+        .attr("transform", "translate("+person.name_pos.x+","+person.name_pos.y+") rotate(-45)")
+        .attr("text-anchor","start")
+        .attr("class", "person-text")
+        .style("fill", person.color)
+        .text(person.name);
+    }
+  }
+
+
+  function calc_events_chart_data() {
+    var event, i, j, sum_default_x, event_date_range;
+
+    event_date_range = max_date - min_date;
+
+    function person_id_cmp(p1,p2) { return p1.id > p2.id; }
+    for (i=0;i<events.length;i++) {
+      event = events[i];
+      event.people.sort(person_id_cmp);
+
+      // we compute an event's X by averaging the default_x of its participants
+      sum_default_x = 0;
+      for (j=0; j<event.people.length; j++) {
+        sum_default_x += find_person_by_id(event.people[j].id).default_x;
+      }
+
+      event.cx = sum_default_x / event.people.length;
+      event.cy = (event.dateInt - min_date) * chart_height / event_date_range;
+      event.rx = 10*(event.people.length + 1);
+      event.ry = 10;
+    }
+  }
+
+  function draw_events() {
+    var i, event;
+    for (i=0;i<events.length;i++) {
+      event = events[i];
+      svg
+        .append("ellipse")
+        .attr("cx", event.cx)
+        .attr("cy", event.cy)
+        .attr("rx", event.rx)
+        .attr("ry", event.ry)
+        .attr("class", "event")
+        .attr("id","E"+event.id)
+        .on("click", function() { event_popup(this.id.substr(1), d3.mouse(this)); });
+    }  
+  }
 
   this.draw_chart = function() {
     d3.json("/events/api/event/", function(e) {
       d3.json("/events/api/person/", function(p) {
-        var i, j, event, person, sum_default_x, min_date, max_date, event_date_range, previous_event, idx, prevx, thisx, previdx, timescale, yAxis, path, person_name = {};
+        var i, j, event, person, sum_default_x, event_date_range, timescale, yAxis;
         events = e, people = p;
         
         svg = d3
@@ -135,81 +242,19 @@ var Narrative = function() {
           min_date = Math.min(min_date, events[i].dateInt);
           max_date = Math.max(max_date, events[i].dateInt);
         }
-        event_date_range = max_date - min_date;
-
 
         // a person's default_x is that person's default position on the chart
         for (j=0;j<people.length;j++) {
           people[j].default_x = chart_width * (j+1) / (people.length+1); // todo: use d3.scale.ordinal
         }
 
-        function person_id_cmp(p1,p2) { return p1.id > p2.id; }
-        for (i=0;i<events.length;i++) {
-          event = events[i];
-          event.people.sort(person_id_cmp);
+        calc_events_chart_data();
+        calc_people_chart_data();
 
-          // we compute an event's X by averaging the default_x of its participants
-          sum_default_x = 0;
-          for (j=0; j<event.people.length; j++) {
-            sum_default_x += find_person_by_id(event.people[j].id).default_x;
-          }
+        draw_people();
+        draw_events();
 
-          event.cx = sum_default_x / event.people.length;
-          event.cy = (event.dateInt - min_date) * chart_height / event_date_range;
-          event.rx = 10*(event.people.length + 1);
-          event.ry = 10;
-
-          svg
-            .append("ellipse")
-            .attr("cx", event.cx)
-            .attr("cy", event.cy)
-            .attr("rx", event.rx)
-            .attr("ry", event.ry)
-            .attr("class", "event")
-            .attr("id","event-"+event.id);
-        }
-
-        // Trace each person's timeline
-        for (i=0; i<people.length; i++) {
-          person = people[i];          
-          previous_event = null;
-          path = "";
-          for (j=0; j<events.length; j++) {
-            event = events[j];
-            idx = index_person_in_event(person, event);
-            if (idx !== -1) {
-              if (previous_event) {
-                // trace person's line from event to previous_event
-                prevx = previous_event.cx - previous_event.rx/2 + previdx*people_spacing_in_event;
-                thisx = event.cx - event.rx/2 + idx*people_spacing_in_event;
-                path += get_path(prevx, previous_event.cy, thisx, event.cy);
-              } else {
-                // the person's first event - write their name
-                person_name.x = event.cx - event.rx/2 + idx*people_spacing_in_event;
-                person_name.y = event.cy;
-              }
-              previous_event = event;
-              previdx = idx;
-            }
-          }
-          var person_color = d3.rgb(color(person.id)).darker(0.5).toString();
-          svg
-            .append("text")
-            .attr("transform", "translate("+person_name.x+","+person_name.y+") rotate(-45)")
-            .attr("text-anchor","start")
-            .attr("class", "person-text")
-            .style("fill", person_color)
-            .text(person.name);
-          svg
-            .append("path")
-            .attr("d", path)
-            .attr("class", "person-path")
-            .attr("id", "P"+person.id)
-            .style("stroke", person_color)
-            .on("click", function() { person_popup(this.id.substr(1), d3.mouse(this)); });
-        }
-
-        // text labels 
+        // text labels for events
         for (i=0;i<events.length;i++) {
           event = events[i];
           svg
