@@ -16,10 +16,14 @@
 .event-text {
   fill: black;
   font-family: sans-serif;
+  font-size: 18;
+  font-weight: bold;
 }
 
 .person-text {
   font-family: sans-serif;
+  font-size: 18;
+  font-weight: bold;
 }
 
 .event_tooltip {
@@ -29,7 +33,7 @@
 .person-path {
   stroke: #ddd;
   fill-opacity: 0;
-  stroke-width: 10;
+  stroke-width: 8;
   z-index: 3;
   stroke-linecap: round;
 }
