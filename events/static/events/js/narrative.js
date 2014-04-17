@@ -61,7 +61,7 @@ var Narrative = function() {
   }
 
 
-  function popup_text(text, x,y) {
+  function popup_text(text, link, x, y) {
     var popup, dummy_text_node;
     popup = svg
       .append("g")
@@ -82,6 +82,8 @@ var Narrative = function() {
       .attr("height",40)
       .attr("class", "event_tooltip");
     popup
+      .append("a")
+      .attr("xlink:href",link)
       .append("text")
       .attr("x",x)
       .attr("y",y)
@@ -94,13 +96,13 @@ var Narrative = function() {
   function event_popup(event_id, mouse) {
     var event;
     event = find_event_by_id(event_id);
-    popup_text(event.title, mouse[0], mouse[1]);
+    popup_text(event.title, "/events/event/"+event_id, mouse[0], mouse[1]);
   }
 
   function person_popup(person_id, mouse) {
     var person;
     person = find_person_by_id(person_id);
-    popup_text(person.name, mouse[0], mouse[1]);
+    popup_text(person.name, "/events/person/"+person_id, mouse[0], mouse[1]);
   }
 
   function abbreviate(text,max_length) {
@@ -216,6 +218,7 @@ var Narrative = function() {
         svg = d3
           .select("#chart")
           .append("svg")
+          .attr("xmlns:xmlns:xlink","http://www.w3.org/1999/xlink")
           .attr("viewBox", "-"+margin+" -"+margin+" "+(chart_width+2*margin)+" "+(chart_height+2*margin))
           .attr("width", chart_width)
           .attr("height", chart_height)
