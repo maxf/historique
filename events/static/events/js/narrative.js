@@ -61,7 +61,7 @@ var Narrative = function() {
   }
 
 
-  function popup_text(text, link, x, y) {
+  function popup_text(text, type, link, x, y, color) {
     var popup, dummy_text_node;
     popup = svg
       .append("g")
@@ -74,13 +74,16 @@ var Narrative = function() {
       .attr("font-family","sans-serif")
       .attr("font-size",20)
       .text(text);
-    popup
+    var rect = popup
       .append("rect")
       .attr("x",x-10)
       .attr("y",y-25)
       .attr("width",dummy_text_node[0][0].getBBox().width+20)
-      .attr("height",40)
-      .attr("class", "event_tooltip");
+      .attr("height",40);
+//      .attr("class", type+"-tooltip");
+    if (color) {
+      rect.attr("fill", color);
+    }
     popup
       .append("a")
       .attr("xlink:href",link)
@@ -96,13 +99,13 @@ var Narrative = function() {
   function event_popup(event_id, mouse) {
     var event;
     event = find_event_by_id(event_id);
-    popup_text(event.title, "/events/event/"+event_id, mouse[0], mouse[1]);
+    popup_text(event.title, "event", "/events/event/"+event_id, mouse[0], mouse[1]);
   }
 
   function person_popup(person_id, mouse) {
     var person;
     person = find_person_by_id(person_id);
-    popup_text(person.name, "/events/person/"+person_id, mouse[0], mouse[1]);
+    popup_text(person.name, "person", "/events/person/"+person_id, mouse[0], mouse[1], person.color);
   }
 
   function abbreviate(text,max_length) {
@@ -154,7 +157,7 @@ var Narrative = function() {
         .attr("class", "person-path")
         .attr("id", "P"+person.id)
         .style("stroke", person.color)
-        .on("click", function() { person_popup(this.id.substr(1), d3.mouse(this)); });
+        .on("mouseover", function() { person_popup(this.id.substr(1), d3.mouse(this)); });
     }
     // separate loop because we want to see all text in front
     for (i=0; i<people.length; i++) {
@@ -205,7 +208,7 @@ var Narrative = function() {
         .attr("ry", event.ry)
         .attr("class", "event")
         .attr("id","E"+event.id)
-        .on("click", function() { event_popup(this.id.substr(1), d3.mouse(this)); });
+        .on("mouseover", function() { event_popup(this.id.substr(1), d3.mouse(this)); });
     }  
   }
 

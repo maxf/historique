@@ -26,7 +26,11 @@
   font-weight: bold;
 }
 
-.event_tooltip {
+.person-tooltip {
+  fill: #fc3;
+}
+
+.event-tooltip {
   fill: #fc3;
 }
 
