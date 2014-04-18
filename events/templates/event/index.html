@@ -1,7 +1,7 @@
 <html>
   <head>
     {% include 'common/head.html' %}
-    <title>{{ event.title }}</title>
+    <title>{{ instance_settings.title }}</title>
   </head>
   <body>
     {% include 'common/header.html' %}
@@ -18,15 +18,15 @@
 
       <div>{{ event.description }}</div>
    
-      <h2>Liens</h2>
+      <h2>{{ instance_settings.links }}</h2>
     
       {% include "common/links_helper.html" %}
     
-      <h2>Participants</h2>
+      <h2>{{ instance_settings.people }}</h2>
     
       {% include "people/template_list.html" %}
     
-      <h2>Commentaires</h2>
+      <h2>{{ instance_settings.comments }}</h2>
     
       {% if comments %}
         <ul>
@@ -35,14 +35,14 @@
         {% endfor %}
         </ul>
       {% else %}
-        <p>Pas de commentaires</p>
+        <p>{{ instance_settings.no_comments }}</p>
       {% endif %}
     
-      <h2>Ajouter un commentaire</h2>
+      <h2>{{ instance_settings.add_comment }}</h2>
       <form action="{% url 'events:send_comment' event.id %}" method="post">
         {% csrf_token %}
         <textarea name="comment_text" rows="10" cols="50"></textarea>
-        <input type="submit" value="Envoyer" />
+        <input type="submit" value="{{ instance_settings.send }}" />
       </form>
     </div>
   </div>

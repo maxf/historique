@@ -1,20 +1,21 @@
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
+from django.conf import settings
 from rest_framework import viewsets
 from rest_framework.response import Response
 from events.models import Event, Comment, Person, Link
 from events.serializers import PersonSerializer, PeopleSerializer, EventSerializer
 
 def home(request):
-    return render(request, 'home/index.html')
+    return render(request, 'home/index.html', {'instance_settings': settings.INSTANCE_SETTINGS})
 
 def events(request):
     events = Event.objects.order_by('date')
-    return render(request, 'events/index.html', {'events':events})
+    return render(request, 'events/index.html', {'events':events, 'instance_settings': settings.INSTANCE_SETTINGS})
 
 def people(request):
     people = Person.objects.order_by('name')
-    return render(request, 'people/index.html', {'people':people})
+    return render(request, 'people/index.html', {'people':people, 'instance_settings': settings.INSTANCE_SETTINGS})
 
 def event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
@@ -22,7 +23,8 @@ def event(request, event_id):
         'event': event,
         'comments':Comment.objects.filter(event_id=event_id),
         'links': event.links.all(),
-        'people': event.people.all()
+        'people': event.people.all(),
+        'instance_settings': settings.INSTANCE_SETTINGS
     }
     return render(request, 'event/index.html', context)
 
@@ -41,7 +43,8 @@ def person(request, person_id):
     person = get_object_or_404(Person, id=person_id)
     links = person.links.all()
     events = Event.objects.filter(people=person)
-    return render(request, 'person/index.html', {'person': person, 'links': links, 'events': events})
+    context = {'person': person, 'links': links, 'events': events, 'instance_settings': settings.INSTANCE_SETTINGS}
+    return render(request, 'person/index.html', context)
 
 
 

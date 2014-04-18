@@ -3,7 +3,7 @@
 <html>
   <head>
     {% include 'common/head.html' %}
-    <title>Histoire du LIFL</title>
+    <title>{{ instance_settings.title }}</title>
     <link rel="stylesheet" href="{% static 'events/css/graph.css' %}"/>
   </head>
   <body role="document">
@@ -12,8 +12,8 @@
     <div class="container theme-showcase" role="main">
 
       <div class="jumbotron">
-        <h1>L'histoire du LIFL</h1>
-        <p>blah blah blah</p>
+        <h1>{{ instance_settings.title }}</h1>
+        <p>{{ instance_settings.description }}</p>
       </div>
 
       <p id="chart">

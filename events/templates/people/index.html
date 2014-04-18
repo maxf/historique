@@ -1,14 +1,14 @@
 <html>
   <head>
     {% include 'common/head.html' %}
-    <title>{{Personnes}}</title>
+    <title>{{ instance_settings.people }}</title>
   </head>
   <body>
     {% include 'common/header.html' %}
 
     <div class="container theme-showcase" role="main">
       <div class="jumbotron">
-        <h1>Personnes</h1>
+        <h1>{{ instance_settings.people }}</h1>
       </div>
 
       {% include "people/template_list.html" %}

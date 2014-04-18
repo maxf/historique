@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Django settings for timelines project.
 
@@ -70,18 +71,6 @@ DATABASES = {
     }
 }
 
-# Internationalization
-# https://docs.djangoproject.com/en/1.6/topics/i18n/
-
-LANGUAGE_CODE = 'fr-FR'
-
-TIME_ZONE = 'CET'
-
-USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -103,10 +92,34 @@ REST_FRAMEWORK = {
         'rest_framework.serializers.HyperlinkedModelSerializer',
 }
 
-#print "SECRET_KEY: "+SECRET_KEY
-#print "DEBUG: "+str(DEBUG)
-#print "TEMPLATE_DEBUG: "+str(TEMPLATE_DEBUG)
-#print "ALLOWED_HOSTS: "+str(ALLOWED_HOSTS)
-#print "DATABASES: "+str(DATABASES)
-#print "CSRF_COOKIE_SECURE: "+str(CSRF_COOKIE_SECURE)
-#print "SESSION_COOKIE_SECURE: "+str(SESSION_COOKIE_SECURE)
+
+##########################################
+# Variables for specific instance
+# To be customised before running
+
+INSTANCE_SETTINGS = {
+    'title': 'Histoire du LIFL',
+    'description': "Déroulement de l'histoire du Laboratoire d'Informatique Fondamentale de Lille, de 1980 a 2014",
+    'people': 'Personnes',
+    'events': 'Historique',
+    'no_events': "Pas d'historique",
+    'no_people': "Pas de personnes",
+    'links': "Liens",
+    'comments': 'Commentaires',
+    'no_comments': 'Pas de commentaires',
+    'add_comment': 'Ajouter un commentaire',
+    'send': 'Envoyer',
+}
+
+# Internationalization
+# https://docs.djangoproject.com/en/1.6/topics/i18n/
+
+LANGUAGE_CODE = 'fr-FR'
+
+TIME_ZONE = 'CET'
+
+USE_I18N = True
+
+USE_L10N = True
+
+USE_TZ = True

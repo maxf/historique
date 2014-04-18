@@ -14,11 +14,11 @@
         </h1>
       </div>
 
-      <h2>Liens</h2>
+      <h2>{{ instance_settings.links }}</h2>
   
       {% include "common/links_helper.html" %}
   
-      <h2>Historique</h2>
+      <h2>{{ instance_settings.events }}</h2>
   
       {% include "events/template_list.html" %}
     </div>  
