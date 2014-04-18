@@ -96,13 +96,13 @@ var Narrative = function() {
   function event_popup(event_id, mouse) {
     var event;
     event = find_event_by_id(event_id);
-    popup_text(event.title, "/events/event/"+event_id, mouse[0], mouse[1]);
+    popup_text(event.title, "event/"+event_id, mouse[0], mouse[1]);
   }
 
   function person_popup(person_id, mouse) {
     var person;
     person = find_person_by_id(person_id);
-    popup_text(person.name, "/events/person/"+person_id, mouse[0], mouse[1], person.color);
+    popup_text(person.name, "person/"+person_id, mouse[0], mouse[1], person.color);
   }
 
   function abbreviate(text,max_length) {
@@ -160,6 +160,8 @@ var Narrative = function() {
     for (i=0; i<people.length; i++) {
       person = people[i];
       svg
+        .append("a")
+        .attr("xlink:href","person/"+person.id)
         .append("text")
         .attr("transform", "translate("+person.name_pos.x+","+person.name_pos.y+") rotate(-45)")
         .attr("text-anchor","start")
@@ -261,6 +263,8 @@ var Narrative = function() {
         for (i=0;i<events.length;i++) {
           event = events[i];
           svg
+            .append("a")
+            .attr("xlink:href","event/"+event.id)
             .append("text")
             .attr("x", event.cx-event.rx/2)
             .attr("y", event.cy+20)
