@@ -61,8 +61,8 @@ var Narrative = function() {
   }
 
 
-  function popup_text(text, type, link, x, y, color) {
-    var popup, dummy_text_node;
+  function popup_text(text, link, x, y, color) {
+    var popup, dummy_text_node, rect;
     popup = svg
       .append("g")
       .on("mouseout", function() { this.remove(); });
@@ -74,16 +74,13 @@ var Narrative = function() {
       .attr("font-family","sans-serif")
       .attr("font-size",20)
       .text(text);
-    var rect = popup
+    rect = popup
       .append("rect")
       .attr("x",x-10)
       .attr("y",y-25)
       .attr("width",dummy_text_node[0][0].getBBox().width+20)
-      .attr("height",40);
-//      .attr("class", type+"-tooltip");
-    if (color) {
-      rect.attr("fill", color);
-    }
+      .attr("height",40)
+      .attr("fill", color ? color : "#fc3");
     popup
       .append("a")
       .attr("xlink:href",link)
@@ -99,13 +96,13 @@ var Narrative = function() {
   function event_popup(event_id, mouse) {
     var event;
     event = find_event_by_id(event_id);
-    popup_text(event.title, "event", "/events/event/"+event_id, mouse[0], mouse[1]);
+    popup_text(event.title, "/events/event/"+event_id, mouse[0], mouse[1]);
   }
 
   function person_popup(person_id, mouse) {
     var person;
     person = find_person_by_id(person_id);
-    popup_text(person.name, "person", "/events/person/"+person_id, mouse[0], mouse[1], person.color);
+    popup_text(person.name, "/events/person/"+person_id, mouse[0], mouse[1], person.color);
   }
 
   function abbreviate(text,max_length) {

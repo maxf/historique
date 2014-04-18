@@ -26,14 +26,6 @@
   font-weight: bold;
 }
 
-.person-tooltip {
-  fill: #fc3;
-}
-
-.event-tooltip {
-  fill: #fc3;
-}
-
 .person-path {
   stroke: #ddd;
   fill-opacity: 0;
