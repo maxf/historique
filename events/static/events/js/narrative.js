@@ -6,9 +6,9 @@ var Narrative = function() {
   var
     svg,
     events, people,
-    chart_width = 800,
-    chart_height = 2000,
-    margin = 50,
+    chart_width = 5000,
+    chart_height = 800,
+    margin = 30,
     curvature = 0.3,
     color = d3.scale.category20(),
     people_spacing_in_event = 20,
@@ -21,12 +21,12 @@ var Narrative = function() {
   }
 
   function get_path(x0,y0,x1,y1) {
-    var yi = d3.interpolateNumber(y0, y1),
-        y2 = yi(curvature),
-        y3 = yi(1 - curvature);
+    var xi = d3.interpolateNumber(x0, x1),
+        x2 = xi(curvature),
+        x3 = xi(1 - curvature);
     return "M" + x0 + "," + y0 +
-           "C" + x0 + "," + y2 +
-           " " + x1 + "," + y3 +
+           "C" + x2 + "," + y0 +
+           " " + x3 + "," + y1 +
            " " + x1 + "," + y1;
   }
 
@@ -114,7 +114,7 @@ var Narrative = function() {
   }
 
   function calc_people_chart_data() {
-    var person, event, previous_event, i, j, idx, previdx, thisx, prevx;
+    var person, event, previous_event, i, j, idx, previdx, thisy, prevy;
     // Trace each person's timeline
     for (i=0; i<people.length; i++) {
       person = people[i];          
@@ -126,14 +126,14 @@ var Narrative = function() {
         if (idx !== -1) {
           if (previous_event) {
             // trace person's line from event to previous_event
-            prevx = previous_event.cx - previous_event.rx/2 + previdx*people_spacing_in_event;
-            thisx = event.cx - event.rx/2 + idx*people_spacing_in_event;
-            person.path += get_path(prevx, previous_event.cy, thisx, event.cy);
+            prevy = previous_event.cy - previous_event.ry/2 + previdx*people_spacing_in_event;
+            thisy = event.cy - event.ry/2 + idx*people_spacing_in_event;
+            person.path += get_path(previous_event.cx, prevy, event.cx, thisy);
           } else {
             // the person's first event - write their name
             person.name_pos = {
-              x: event.cx - event.rx/2 + idx*people_spacing_in_event, 
-              y: event.cy
+              y: event.cy - event.ry/2 + idx*people_spacing_in_event, 
+              x: event.cx
             };
           }
           previous_event = event;
@@ -163,8 +163,8 @@ var Narrative = function() {
         .append("a")
         .attr("xlink:href","person/"+person.id)
         .append("text")
-        .attr("transform", "translate("+person.name_pos.x+","+person.name_pos.y+") rotate(-45)")
-        .attr("text-anchor","start")
+        .attr("transform", "translate("+(person.name_pos.x-5)+","+(person.name_pos.y-5)+") rotate(-45)")
+        .attr("text-anchor","end")
         .attr("class", "person-text")
         .style("fill", person.color)
         .text(person.name);
@@ -173,7 +173,7 @@ var Narrative = function() {
 
 
   function calc_events_chart_data() {
-    var event, i, j, sum_default_x, event_date_range;
+    var event, i, j, sum_default_y, event_date_range;
 
     event_date_range = max_date - min_date;
 
@@ -182,16 +182,16 @@ var Narrative = function() {
       event = events[i];
       event.people.sort(person_id_cmp);
 
-      // we compute an event's X by averaging the default_x of its participants
-      sum_default_x = 0;
+      // we compute an event's Y by averaging the default_y of its participants
+      sum_default_y = 0;
       for (j=0; j<event.people.length; j++) {
-        sum_default_x += find_person_by_id(event.people[j].id).default_x;
+        sum_default_y += find_person_by_id(event.people[j].id).default_y;
       }
 
-      event.cx = sum_default_x / event.people.length;
-      event.cy = (event.dateInt - min_date) * chart_height / event_date_range;
-      event.rx = 10*(event.people.length + 1);
-      event.ry = 10;
+      event.cy = sum_default_y / event.people.length;
+      event.cx = (event.dateInt - min_date) * chart_width / event_date_range;
+      event.ry = 10*(event.people.length + 1);
+      event.rx = 10;
     }
   }
 
@@ -214,8 +214,9 @@ var Narrative = function() {
   this.draw_chart = function() {
     d3.json("/events/api/event/", function(e) {
       d3.json("/events/api/person/", function(p) {
-        var i, j, event, person, sum_default_x, event_date_range, timescale, yAxis;
-        events = e, people = p;
+        var i, j, event, timescale, time_axis;
+        events = e;
+        people = p;
         
         svg = d3
           .select("#chart")
@@ -232,13 +233,13 @@ var Narrative = function() {
         // draw time axis
         timescale = d3.time.scale()
           .domain([new Date(events[0].date), new Date(events[events.length-1].date)])
-          .range([0,chart_height]);
-        yAxis = d3.svg.axis()
+          .range([0,chart_width]);
+        time_axis = d3.svg.axis()
           .scale(timescale)
-          .orient('left');
+          .orient('bottom');
         svg.append("g")
           .attr('class', 'axis')
-          .call(yAxis);
+          .call(time_axis);
 
         // time calculations (todo: use timescale)
         min_date=9999999999999; max_date=0;
@@ -248,9 +249,9 @@ var Narrative = function() {
           max_date = Math.max(max_date, events[i].dateInt);
         }
 
-        // a person's default_x is that person's default position on the chart
+        // a person's default_y is that person's default position on the chart
         for (j=0;j<people.length;j++) {
-          people[j].default_x = chart_width * (j+1) / (people.length+1); // todo: use d3.scale.ordinal
+          people[j].default_y = chart_height * (j+1) / (people.length+1); // todo: use d3.scale.ordinal
         }
 
         calc_events_chart_data();
@@ -266,9 +267,9 @@ var Narrative = function() {
             .append("a")
             .attr("xlink:href","event/"+event.id)
             .append("text")
-            .attr("x", event.cx-event.rx/2)
-            .attr("y", event.cy+20)
-            .attr("text-anchor", "end")
+            .attr("x", event.cx+10)
+            .attr("y", event.cy-event.ry)
+            .attr("text-anchor", "start")
             .attr("class", "event-text")
             .text(abbreviate(event.title,20));
         }
