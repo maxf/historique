@@ -211,10 +211,28 @@ var Narrative = function() {
     }  
   }
 
+  function draw_event_labels() {
+    var event, i;
+    for (i=0;i<events.length;i++) {
+      event = events[i];
+      svg
+        .append("a")
+        .attr("xlink:href","event/"+event.id)
+        .append("text")
+        .attr("x", event.cx+10)
+        .attr("y", event.cy-event.ry)
+        .attr("text-anchor", "start")
+        .attr("class", "event-text")
+        .text(abbreviate(event.title,20));
+    }
+  }
+
+
+
   this.draw_chart = function() {
     d3.json("/events/api/event/", function(e) {
       d3.json("/events/api/person/", function(p) {
-        var i, j, event, timescale, time_axis;
+        var i, j, timescale, time_axis;
         events = e;
         people = p;
         
@@ -260,19 +278,7 @@ var Narrative = function() {
         draw_people();
         draw_events();
 
-        // text labels for events
-        for (i=0;i<events.length;i++) {
-          event = events[i];
-          svg
-            .append("a")
-            .attr("xlink:href","event/"+event.id)
-            .append("text")
-            .attr("x", event.cx+10)
-            .attr("y", event.cy-event.ry)
-            .attr("text-anchor", "start")
-            .attr("class", "event-text")
-            .text(abbreviate(event.title,20));
-        }
+        draw_event_labels();
       });
     });
   };
