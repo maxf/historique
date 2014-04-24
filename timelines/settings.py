@@ -98,17 +98,17 @@ REST_FRAMEWORK = {
 # To be customised before running
 
 INSTANCE_SETTINGS = {
-    'title': 'Histoire du LIFL',
-    'description': "Déroulement de l'histoire du Laboratoire d'Informatique Fondamentale de Lille, de 1980 a 2014",
-    'people': 'Personnes',
-    'events': 'Historique',
-    'no_events': "Pas d'historique",
-    'no_people': "Pas de personnes",
-    'links': "Liens",
-    'comments': 'Commentaires',
-    'no_comments': 'Pas de commentaires',
-    'add_comment': 'Ajouter un commentaire',
-    'send': 'Envoyer',
+    "title": "%%title%%",
+    "description": "%%description%%",
+    "people": "%%people%%",
+    "events": "%%events%%",
+    "no_events": "%%no_events%%",
+    "no_people": "%%no_people%%",
+    "links": "%%links%%",
+    "comments": "%%comments%%",
+    "no_comments": "%%no_comments%%",
+    "add_comment": "%%add_comment%%",
+    "send": "%%send%%",
 }
 
 # Internationalization
