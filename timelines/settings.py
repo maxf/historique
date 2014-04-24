@@ -94,32 +94,15 @@ REST_FRAMEWORK = {
 
 
 ##########################################
-# Variables for specific instance
-# To be customised before running
+import Instance
 
-INSTANCE_SETTINGS = {
-    "title": "%%title%%",
-    "description": "%%description%%",
-    "people": "%%people%%",
-    "events": "%%events%%",
-    "no_events": "%%no_events%%",
-    "no_people": "%%no_people%%",
-    "links": "%%links%%",
-    "comments": "%%comments%%",
-    "no_comments": "%%no_comments%%",
-    "add_comment": "%%add_comment%%",
-    "send": "%%send%%",
-}
+INSTANCE_SETTINGS = Instance.Settings()
 
-# Internationalization
-# https://docs.djangoproject.com/en/1.6/topics/i18n/
 
-LANGUAGE_CODE = 'fr-FR'
+LANGUAGE_CODE = INSTANCE_SETTINGS['language']
+TIME_ZONE = INSTANCE_SETTINGS['timezone']
+USE_I18N = INSTANCE_SETTINGS['use_i18n']
+USE_L10N = INSTANCE_SETTINGS['use_l10n']
+USE_TZ = INSTANCE_SETTINGS['use_tz']
 
-TIME_ZONE = 'CET'
-
-USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = True
+##########################################
