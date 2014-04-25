@@ -234,8 +234,8 @@ var Narrative = function() {
       d3.json("/events/api/person/", function(p) {
         var i, j, timescale, time_axis;
         events = e;
-        people = p;
-        
+        people = p.filter(function(person) { return person.event_set.length>0; }); // remove people with no event
+
         svg = d3
           .select("#chart")
           .append("svg")
@@ -251,10 +251,12 @@ var Narrative = function() {
         // draw time axis
         timescale = d3.time.scale()
           .domain([new Date(events[0].date), new Date(events[events.length-1].date)])
-          .range([0,chart_width]);
+          .range([0,chart_width])
+          .nice(d3.time.year); // should depend on domain width
         time_axis = d3.svg.axis()
           .scale(timescale)
-          .orient('bottom');
+          .orient('bottom')
+          .tickFormat(d3.time.format("%Y"));  // should depend on domain width
         svg.append("g")
           .attr('class', 'axis')
           .call(time_axis);
