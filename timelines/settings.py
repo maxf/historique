@@ -60,16 +60,20 @@ WSGI_APPLICATION = 'timelines.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('PGDATABASE','timelines'),
-        'USER': os.environ.get('PGUSER','timelines'),
-        'PASSWORD': os.environ.get('PGPASSWORD','timelines'),
-        'HOST': os.environ.get('PGHOST','localhost')
+IS_HEROKU = bool(os.environ.get('IS_HEROKU', False))
+if IS_HEROKU:
+    import dj_database_url
+    DATABASES['default'] =  dj_database_url.config()
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.environ.get('PGDATABASE','timelines'),
+            'USER': os.environ.get('PGUSER','timelines'),
+            'PASSWORD': os.environ.get('PGPASSWORD','timelines'),
+            'HOST': os.environ.get('PGHOST','localhost')
+        }
     }
-}
 
 
 
@@ -78,11 +82,16 @@ DATABASES = {
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.environ.get('STATIC_ROOT', '')
+if IS_HEROKU:
+    STATICFILES_DIRS = (
+        os.path.join(BASE_DIR, 'static'),
+    )
 
 # we're HTTPS on production
 CSRF_COOKIE_SECURE=bool(os.environ.get('CSRF_COOKIE_SECURE', False))
 SESSION_COOKIE_SECURE=bool(os.environ.get('SESSION_COOKIE_SECURE', False))
-
+if IS_HEROKU:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 REST_FRAMEWORK = {
