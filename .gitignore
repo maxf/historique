@@ -4,3 +4,4 @@
 .tern-port
 Instance.py
 virtualenv
+.DS_Store
