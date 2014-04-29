@@ -57,24 +57,18 @@ ROOT_URLCONF = 'timelines.urls'
 
 WSGI_APPLICATION = 'timelines.wsgi.application'
 
+IS_HEROKU = bool(os.environ.get('IS_HEROKU', False))
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
-IS_HEROKU = bool(os.environ.get('IS_HEROKU', False))
+import dj_database_url
 if IS_HEROKU:
-    import dj_database_url
     DATABASES = {
         'default': dj_database_url.config()
     }
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.environ.get('PGDATABASE','timelines'),
-            'USER': os.environ.get('PGUSER','timelines'),
-            'PASSWORD': os.environ.get('PGPASSWORD','timelines'),
-            'HOST': os.environ.get('PGHOST','localhost')
-        }
+        'default': dj_database_url.parse(os.environ.get('PGURL','postgres://timelines:timelines@localhost/timelines'))
     }
 
 
