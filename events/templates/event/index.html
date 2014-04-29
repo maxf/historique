@@ -25,7 +25,8 @@
       <h2>{{ instance_settings.people }}</h2>
     
       {% include "people/template_list.html" %}
-    
+
+      {% if settings.INSTANCE_SETTINGS.features_enabled.comments %}
       <h2>{{ instance_settings.comments }}</h2>
     
       {% if comments %}
@@ -45,6 +46,7 @@
         <input type="submit" value="{{ instance_settings.send }}" />
       </form>
     </div>
+    {% endif %}
   </div>
   {% include 'common/scripts.html' %}
 

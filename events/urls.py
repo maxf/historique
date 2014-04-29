@@ -10,14 +10,19 @@ urlpatterns = patterns('',
     url(r'^events/$', views.events, name='events'),
     url(r'^people/$', views.people, name='people'),
     url(r'^event/(?P<event_id>\d+)/$', views.event, name='event'),
-    url(r'^event/(?P<event_id>\d+)/send_comment/$', views.send_comment, name='send_comment'),
-    url(r'^event/(?P<event_id>\d+)/delete_comment/(?P<comment_id>\d+)/$', views.delete_comment, name='delete_comment'),
     url(r'^person/(?P<person_id>\d+)/$', views.person, name='person'),
 
 #    url(r'^api/people/$', views.PeopleList.as_view()),
 #    url(r'^api/person/(?P<pk>[0-9]+)/$', views.PersonDetail.as_view(), name='person-detail'),
 #    url(r'^api/event/(?P<pk>[0-9]+)/$', views.EventDetail.as_view()),
 )
+
++if settings.INSTANCE_SETTINGS['features_enabled']['comments']:
+    urlpatterns += patterns('',
+        url(r'^event/(?P<event_id>\d+)/send_comment/$', views.send_comment, name='send_comment'),
+        url(r'^event/(?P<event_id>\d+)/delete_comment/(?P<comment_id>\d+)/$', views.delete_comment, name='delete_comment')
+    )
+
 
 #urlpatterns = format_suffix_patterns(urlpatterns)
 
