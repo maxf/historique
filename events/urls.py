@@ -17,7 +17,7 @@ urlpatterns = patterns('',
 #    url(r'^api/event/(?P<pk>[0-9]+)/$', views.EventDetail.as_view()),
 )
 
-+if settings.INSTANCE_SETTINGS['features_enabled']['comments']:
+if settings.INSTANCE_SETTINGS['features_enabled']['comments']:
     urlpatterns += patterns('',
         url(r'^event/(?P<event_id>\d+)/send_comment/$', views.send_comment, name='send_comment'),
         url(r'^event/(?P<event_id>\d+)/delete_comment/(?P<comment_id>\d+)/$', views.delete_comment, name='delete_comment')

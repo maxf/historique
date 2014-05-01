@@ -11,7 +11,7 @@ var Narrative = function() {
     margin = 30,
     curvature = 0.3,
     color = d3.scale.category20(),
-    people_spacing_in_event = 20,
+    people_spacing_in_event = 17,
     min_date, max_date;
 
   // The API returns dates as 2013-03-21. We need to map that to time axis interval [min(date), max(date)]
@@ -116,8 +116,12 @@ var Narrative = function() {
   function calc_people_chart_data() {
     var person, event, previous_event, i, j, idx, previdx, thisy, prevy;
     // Trace each person's timeline
+    function event_person_y(event, idx) {
+      return (event.cy - event.ry + people_spacing_in_event/2) + idx * people_spacing_in_event;
+    }
     for (i=0; i<people.length; i++) {
-      person = people[i];          
+      person = people[i];
+      person.circles = [];
       previous_event = null;
       person.path = "";
       for (j=0; j<events.length; j++) {
@@ -126,14 +130,16 @@ var Narrative = function() {
         if (idx !== -1) {
           if (previous_event) {
             // trace person's line from event to previous_event
-            prevy = previous_event.cy - previous_event.ry/2 + previdx*people_spacing_in_event;
-            thisy = event.cy - event.ry/2 + idx*people_spacing_in_event;
+            prevy = event_person_y(previous_event, previdx);
+            thisy = event_person_y(event, idx);
             person.path += get_path(previous_event.cx, prevy, event.cx, thisy);
+            person.circles.push({x:event.cx, y:thisy});
           } else {
             // the person's first event - write their name
+            person.circles.push({x:event.cx, y:event_person_y(event, idx)});
             person.name_pos = {
-              y: event.cy - event.ry/2 + idx*people_spacing_in_event, 
-              x: event.cx
+              y: event.cy - event.ry + (idx+1)*people_spacing_in_event, 
+              x: event.cx - 5
             };
           }
           previous_event = event;
@@ -145,7 +151,7 @@ var Narrative = function() {
   }
 
   function draw_people() {
-    var i, person;
+    var i, j, person;
     for (i=0; i<people.length; i++) {
       person = people[i];
       svg
@@ -155,6 +161,14 @@ var Narrative = function() {
         .attr("id", "P"+person.id)
         .style("stroke", person.color)
         .on("mouseover", function() { person_popup(this.id.substr(1), d3.mouse(this)); });
+      for (j=0;j<people[i].circles.length;j++) {
+        svg
+          .append("circle")
+          .style("fill", person.color)
+          .attr("cx", person.circles[j].x)
+          .attr("cy", person.circles[j].y)
+          .attr("r", people_spacing_in_event/2);
+      }
     }
     // separate loop because we want to see all text in front
     for (i=0; i<people.length; i++) {
@@ -190,8 +204,8 @@ var Narrative = function() {
 
       event.cy = sum_default_y / event.people.length;
       event.cx = (event.dateInt - min_date) * chart_width / event_date_range;
-      event.ry = 10*(event.people.length + 1);
-      event.rx = 10;
+      event.ry = people_spacing_in_event*event.people.length/2;
+      event.rx = people_spacing_in_event/2;
     }
   }
 
@@ -199,6 +213,7 @@ var Narrative = function() {
     var i, event;
     for (i=0;i<events.length;i++) {
       event = events[i];
+if (i==0) console.log(event)
       svg
         .append("ellipse")
         .attr("cx", event.cx)

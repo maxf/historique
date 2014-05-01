@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 # Quick-start development settings - unsuitable for production
@@ -72,7 +72,6 @@ else:
     }
 
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
@@ -99,14 +98,29 @@ REST_FRAMEWORK = {
 
 
 ##########################################
-import Instance
-INSTANCE_SETTINGS = Instance.Settings()
+LANGUAGE_CODE = "en-GB"
+TIME_ZONE = "GMT"
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
 
+INSTANCE_SETTINGS =  {
+    "title": "Yes Story",
+    "description": "Timelines of Yes's members",
+    "people": "Artists",
+    "events": "Timeline",
+    "no_events": "No events",
+    "no_people": "No artist",
+    "links": "Links",
+    "comments": "Comments",
+    "no_comments": "No comments yet",
+    "add_comment": "Add a comment",
+    "send": "Send",
 
-LANGUAGE_CODE = INSTANCE_SETTINGS['language']
-TIME_ZONE = INSTANCE_SETTINGS['timezone']
-USE_I18N = INSTANCE_SETTINGS['use_i18n']
-USE_L10N = INSTANCE_SETTINGS['use_l10n']
-USE_TZ = INSTANCE_SETTINGS['use_tz']
+    "features_enabled": {
+        "comments": False
+    }
+
+}
 
 ##########################################
