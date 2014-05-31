@@ -11,18 +11,19 @@
 
     <div class="container theme-showcase" role="main">
 
-      <div class="jumbotron">
         <h1>{{ instance_settings.title }}</h1>
         <p>{{ instance_settings.description }}</p>
-      </div>
-
-      <p id="chart">
+        <p>Drag/slide to pan, scroll/pinch to zoom, click/tap on objects or lines for details</p>
+      <div id="chart">
 
     </div>
 
     <script src="{% static 'events/js/d3.v3.min.js' %}"></script>
     <script src="{% static 'events/js/narrative.js' %}"></script>
-
+    <script>
+      var n=new Narrative(); 
+      n.draw_chart();
+    </script>
   </body>
 </html>
 

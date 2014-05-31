@@ -8,20 +8,22 @@
 
     <div class="container theme-showcase" role="main">
       <div class="jumbotron">
-        <h1>{{ event.title }}</h1>
+        <h1>
+          {{ event.title }}
+        </h1>
       </div>
 
+      {% if event.photo %} <img src="{{ event.photo }}" alt="photo" height="300"/> {% endif %}
+      
     
       {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
     
-      <div>{{ event.eventType }}, {{ event.date }}</div>
+      <h2>{{ event.eventType }}, {{ event.date }}</h2>
 
       <div>{{ event.description }}</div>
-   
-      <h2>{{ instance_settings.links }}</h2>
-    
+
       {% include "common/links_helper.html" %}
-    
+      
       <h2>{{ instance_settings.people }}</h2>
     
       {% include "people/template_list.html" %}

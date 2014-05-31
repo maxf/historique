@@ -20,16 +20,49 @@
   font-weight: bold;
 }
 
+.event-text-not-main {
+  fill: black;
+  font-family: sans-serif;
+  font-size: 12;
+}
+
 .person-text {
   font-family: sans-serif;
   font-size: 18;
   font-weight: bold;
 }
 
+.not-main-person-text {
+  font-family: sans-serif;
+  font-size: 12;
+}
+
 .person-path {
-  stroke: #ddd;
-  fill-opacity: 0;
+  fill: none;
   stroke-width: 10;
   z-index: 3;
+}
+
+.not-main-person-path {
+  fill: none;
+  stroke-width: 6;
+  z-index: 3;
   stroke-linecap: round;
+}
+
+
+.close-button-strokes {
+  stroke: #ddd;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.event_popup {
+  fill: #AD9707;
+}
+
+#chart {
+  border: 3px solid black;
+  width: 2010px;
+  margin-right: 200px;
 }

@@ -1,27 +1,37 @@
+{% load staticfiles %}
+
 <html>
   <head>
     {% include 'common/head.html' %}
     <title>{{person.name}}</title>
+    <link rel="stylesheet" href="{% static 'events/css/graph.css' %}"/>
   </head>
   <body>
     {% include 'common/header.html' %}
 
     <div class="container theme-showcase" role="main">
-      <div class="jumbotron">
-        <h1>
-          {% if person.photo %} <img src="{{ person.photo }}" alt="photo"/> {% endif %}
-          {{ person.name }} 
-        </h1>
-      </div>
 
-      <h2>{{ instance_settings.links }}</h2>
-  
+      <h1>
+        {{ person.name }} 
+      </h1>
+
+      {% if person.photo %} <img src="{{ person.photo }}" alt="photo"/> {% endif %}
+      
+      <p id="chart">
+
       {% include "common/links_helper.html" %}
   
       <h2>{{ instance_settings.events }}</h2>
   
       {% include "events/template_list.html" %}
     </div>  
-    {% include 'common/scripts.html' %}
+
+    <script src="{% static 'events/js/d3.v3.min.js' %}"></script>
+    <script src="{% static 'events/js/narrative.js' %}"></script>
+    <script>
+      var n=new Narrative();
+      n.draw_chart({{ person.id }});
+    </script>
+
   </body>
 </html>

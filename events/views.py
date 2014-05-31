@@ -9,6 +9,10 @@ from events.serializers import PersonSerializer, PeopleSerializer, EventSerializ
 def home(request):
     return render(request, 'home/index.html', {'instance_settings': settings.INSTANCE_SETTINGS})
 
+def about(request):
+    return render(request, 'about/index.html', {'instance_settings': settings.INSTANCE_SETTINGS})
+
+
 def events(request):
     events = Event.objects.order_by('date')
     return render(request, 'events/index.html', {'events':events, 'instance_settings': settings.INSTANCE_SETTINGS})

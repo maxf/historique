@@ -1,7 +1,4 @@
-*.log
-*.pot
+venv
 *.pyc
-.tern-port
-Instance.py
-virtualenv
+staticfiles
 .DS_Store

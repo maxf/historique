@@ -13,7 +13,8 @@
       <ul class="nav navbar-nav">
         <li><a href="{% url 'events:events' %}">{{ instance_settings.events }}</a></li>
         <li><a href="{% url 'events:people' %}">{{ instance_settings.people }}</a></l>
-        <li><a href="/admin/events/">Admin</a></l>
+        <li><a href="/admin/events/">Edit</a></l>
+        <li><a href="{% url 'events:about' %}">About</a></l>
       </ul>
     </div><!--/.nav-collapse -->
   </div>

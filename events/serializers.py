@@ -22,7 +22,7 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
     people = PersonShortSerializer(many=True)
     class Meta:
         model = Event
-        fields = ('id','title','description','date','eventType','people')
+        fields = ('id','title','photo', 'description','date','eventType','people')
         depth = 1
 
 class PersonSerializer(serializers.HyperlinkedModelSerializer):

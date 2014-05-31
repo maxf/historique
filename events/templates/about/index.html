@@ -1,0 +1,46 @@
+{% load staticfiles %}
+
+<html>
+  <head>
+    {% include 'common/head.html' %}
+    <title>{{ instance_settings.title }}</title>
+  </head>
+  <body role="document">
+    {% include 'common/header.html' %}
+
+    <div class="container theme-showcase" role="main">
+
+        <h1>About / Contact</h1>
+
+        <p>This site is powered by an instance of <a href="http://gihtub.com/maxf/historique">historique</a>, a generic framework for illustrating timelines of events and people, or variations. Examples include:</p>
+        <ul>
+          <li>Family members and gatherings (birthdays, weddings, etc.)</li>
+          <li>Organisations: members and events</li>
+          <li>Books, films, or <a href="http://csclub.uwaterloo.ca/~n2iskand/?page_id=13">Comic Books Narrative Charts</a> (whose concepts this site borrows from)</li>
+        </ul>
+
+        <h2>Make your own</h2>
+
+        <p>From the source, historique can be downloaded and installed (see requirements below) and easily configured: titles, description, graphics, language, etc. Then, using the admin pages, events and people can be added. Your site will updated automatically.</p>
+
+        <h3>Requirements</h3>
+
+        <p>You will need a server capable of running Django application and Postgres.</p>
+
+        <h2>History / Acknowledgements</h2>
+
+        <p>Historique was originally created to visualise the story of the research institute where I studied, which is due to close down soon. In order to demo the concept, I wrote a generic framework and worked on a couple of instances (<a href="http://infinite-coast-5577.herokuapp.com/events/">Yesstory</a>, and this one).</p>
+
+        <p>The technologies used include: Django, Postgres, D3.js, nginx, bootstrap.</p>
+
+        <h2>Bugs</h2>
+
+        <p>If you find bugs, you're welcome to report them in github. This is only a demo, so I'm not going to spend too much time on fixing them unless I have a good reason to.</p>
+
+        <h2>Contact</h2>
+
+        <p>max@froumentin.net</p>
+    </div>
+  </body>
+</html>
+

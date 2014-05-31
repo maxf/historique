@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'south',
     'events'
 )
 
@@ -102,15 +103,15 @@ LANGUAGE_CODE = "en-GB"
 TIME_ZONE = "GMT"
 USE_I18N = True
 USE_L10N = True
-USE_TZ = True
+USE_TZ = False
 
 INSTANCE_SETTINGS =  {
-    "title": "Yes Story",
-    "description": "Timelines of Yes's members",
-    "people": "Artists",
-    "events": "Timeline",
-    "no_events": "No events",
-    "no_people": "No artist",
+    "title": "Raiders of the Lost Ark",
+    "description": "An instance of Historique (See 'about' above), a generic timeline visualisation too, showing a timeline of the film.",
+    "people": "Characters",
+    "events": "Scenes",
+    "no_events": "No scenes",
+    "no_people": "No characters",
     "links": "Links",
     "comments": "Comments",
     "no_comments": "No comments yet",

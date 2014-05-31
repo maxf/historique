@@ -1,4 +1,5 @@
 {% if links %}
+<h2>{{ instance_settings.links }}</h2>
 <ul>
   {% for link in links %}
   <li><a href="{{ link.url }}">{{ link.title }}</a></li>
