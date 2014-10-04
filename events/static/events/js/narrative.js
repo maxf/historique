@@ -1,11 +1,11 @@
-var d3;
+var d3, Narrative;
 
-var Narrative = function() {
-  "use strict";
+Narrative = function() {
+  'use strict';
 
   var
-    g_person_url_prefix = "/events/person/",
-    g_event_url_prefix = "/events/event/",
+    g_person_url_prefix = '/events/person/',
+    g_event_url_prefix = '/events/event/',
     g_svg,
     g_events, g_people,
     g_zoom,
@@ -25,7 +25,7 @@ var Narrative = function() {
 
   function to_grey(color) {
     var grey;
-    color = color.brighter(.5);
+    color = color.brighter(0.5);
     grey = (color.r+color.g+color.b)/3;
     return d3.rgb(grey, grey, grey);
   }
@@ -34,16 +34,16 @@ var Narrative = function() {
     var xi = d3.interpolateNumber(x0, x1),
         x2 = xi(g_curvature),
         x3 = xi(1 - g_curvature);
-    return " M" + x0 + "," + y0 +
-           " C" + x2 + "," + y0 +
-           " " + x3 + "," + y1 +
-           " " + x1 + "," + y1;
+    return ' M' + x0 + ',' + y0 +
+           ' C' + x2 + ',' + y0 +
+           ' ' + x3 + ',' + y1 +
+           ' ' + x1 + ',' + y1;
   }
 
   function index_person_in_event(person, event) {
     var i;
     for (i=0; i<event.people.length; i++) {
-      if (event.people[i].id == person.id) {
+      if (event.people[i].id === person.id) {
         return i;
       }
     }
@@ -53,7 +53,7 @@ var Narrative = function() {
   function find_person_by_id(id) {
     var i;
     for (i=0;i<g_people.length;i++) {
-      if (g_people[i].id == id) {
+      if (g_people[i].id === id) {
         return g_people[i];
       }
     }
@@ -63,7 +63,7 @@ var Narrative = function() {
   function find_event_by_id(id) {
     var i;
     for (i=0;i<g_events.length;i++) {
-      if (g_events[i].id == id) {
+      if (g_events[i].id === id) {
         return g_events[i];
       }
     }
@@ -72,36 +72,36 @@ var Narrative = function() {
 
   function tooltip(text, photo_url, link, x, y, color) {
     var popup, popup_width, popup_height, dummy_text_node, rect, popup_close, close_button = {};
-    popup = g_svg.append("g");
+    popup = g_svg.append('g');
     // this text node is only created to get its bounding box and will be discarded later
     dummy_text_node = popup
-      .append("text")
-      .attr("x",x)
-      .attr("y",y)
-      .attr("font-family","sans-serif")
-      .attr("font-size",20)
+      .append('text')
+      .attr('x',x)
+      .attr('y',y)
+      .attr('font-family','sans-serif')
+      .attr('font-size',20)
       .text(text);
     popup_width = dummy_text_node[0][0].getBBox().width+20+40;
     popup_height = 150;
     rect = popup
-      .append("rect")
-      .attr("x",x-10)
-      .attr("y",y-25)
-      .attr("width", popup_width)
-      .attr("height",popup_height);
+      .append('rect')
+      .attr('x',x-10)
+      .attr('y',y-25)
+      .attr('width', popup_width)
+      .attr('height',popup_height);
     if (color) {
-      rect.attr("fill", color);
+      rect.attr('fill', color);
     } else {
-      rect.attr("class", "event_popup");
+      rect.attr('class', 'event_popup');
     }
     popup
-      .append("a")
-      .attr("xlink:href",link)
-      .append("text")
-      .attr("x",x)
-      .attr("y",y)
-      .attr("font-family","sans-serif")
-      .attr("font-size",20)
+      .append('a')
+      .attr('xlink:href',link)
+      .append('text')
+      .attr('x',x)
+      .attr('y',y)
+      .attr('font-family','sans-serif')
+      .attr('font-size',20)
       .text(text);
     dummy_text_node.remove();
 
@@ -109,35 +109,35 @@ var Narrative = function() {
     close_button.radius = 12;
     close_button.cross_size = 5;
     popup_close = popup
-      .append("g")
-      .on("click", function() { popup.remove(); });
+      .append('g')
+      .on('click', function() { popup.remove(); });
     popup_close
-      .append("circle")
-      .attr("cx", close_button.centre.x)
-      .attr("cy", close_button.centre.y)
-      .attr("r", close_button.radius)
-      .attr("fill","#ddd")
-      .attr("opacity",".5")
+      .append('circle')
+      .attr('cx', close_button.centre.x)
+      .attr('cy', close_button.centre.y)
+      .attr('r', close_button.radius)
+      .attr('fill','#ddd')
+      .attr('opacity','.5')
     ;
     popup_close
-      .append("line")
-      .attr("x1", close_button.centre.x - close_button.cross_size)
-      .attr("y1", close_button.centre.y - close_button.cross_size)
-      .attr("x2", close_button.centre.x + close_button.cross_size)
-      .attr("y2", close_button.centre.y + close_button.cross_size)
-      .attr("class", "close-button-strokes");
+      .append('line')
+      .attr('x1', close_button.centre.x - close_button.cross_size)
+      .attr('y1', close_button.centre.y - close_button.cross_size)
+      .attr('x2', close_button.centre.x + close_button.cross_size)
+      .attr('y2', close_button.centre.y + close_button.cross_size)
+      .attr('class', 'close-button-strokes');
     popup_close
-      .append("line")
-      .attr("x1", close_button.centre.x - close_button.cross_size)
-      .attr("y1", close_button.centre.y + close_button.cross_size)
-      .attr("x2", close_button.centre.x + close_button.cross_size)
-      .attr("y2", close_button.centre.y - close_button.cross_size)
-      .attr("class", "close-button-strokes");
+      .append('line')
+      .attr('x1', close_button.centre.x - close_button.cross_size)
+      .attr('y1', close_button.centre.y + close_button.cross_size)
+      .attr('x2', close_button.centre.x + close_button.cross_size)
+      .attr('y2', close_button.centre.y - close_button.cross_size)
+      .attr('class', 'close-button-strokes');
     popup_close
-      .append("image")
-      .attr("x",x).attr("y",y+10)
-      .attr("height", popup_height - 43).attr("width", popup_width - 20)
-      .attr("xlink:href", photo_url)
+      .append('image')
+      .attr('x',x).attr('y',y+10)
+      .attr('height', popup_height - 43).attr('width', popup_width - 20)
+      .attr('xlink:href', photo_url)
     ;
   }
 
@@ -162,7 +162,7 @@ var Narrative = function() {
     if (text.length < max_length) {
       return text;
     } else {
-      return text.substr(0,max_length-2)+"…";
+      return text.substr(0,max_length-2)+'…';
     }
   }
 
@@ -189,7 +189,7 @@ var Narrative = function() {
       person = g_people[i];
       person.circles = [];
       previous_event = null;
-      person.path = "";
+      person.path = '';
       for (j=0; j<g_events.length; j++) {
         event = g_events[j];
         idx = index_person_in_event(person, event);
@@ -223,24 +223,24 @@ var Narrative = function() {
   }
 
   function draw_people() {
-    var i, j, person, style, color, radius, grey;
+    var i, j, person, style, color, radius;
     for (i=g_people.length-1; i>=0; i--) {
       person = g_people[i];
-      if (person.path !== "") {
+      if (person.path !== '') {
         if (g_main_person && person!==g_main_person) {
-          style = "not-main-person-path";
+          style = 'not-main-person-path';
           color = to_grey(person.color);
         } else {
-          style = "person-path";
+          style = 'person-path';
           color = person.color;
         }
         g_svg
-          .append("path")
-          .attr("d", person.path)
-          .attr("class", style)
-          .style("stroke", color)
-          .attr("id", "P"+person.id)
-          .on("click", function() {
+          .append('path')
+          .attr('d', person.path)
+          .attr('class', style)
+          .style('stroke', color)
+          .attr('id', 'P'+person.id)
+          .on('click', function() {
             person_popup(this.id.substr(1), d3.mouse(this));
           });
         }
@@ -253,26 +253,28 @@ var Narrative = function() {
           color = person.color;
         }
         g_svg
-          .append("circle")
-          .style("fill", color)
-          .attr("cx", person.circles[j].x)
-          .attr("cy", person.circles[j].y)
-          .attr("r", radius)
-          .on("click", function() { person_popup(this.id.substr(1), d3.mouse(this)); });
+          .append('circle')
+          .style('fill', color)
+          .attr('cx', person.circles[j].x)
+          .attr('cy', person.circles[j].y)
+          .attr('r', radius)
+          .on('click', function() { person_popup(this.id.substr(1), d3.mouse(this)); });
       }
     }
     // separate loop because we want to see all text in front
     for (i=0; i<g_people.length; i++) {
       person = g_people[i];
-      if (g_main_person && person!==g_main_person) continue;
+      if (g_main_person && person!==g_main_person) {
+        continue;
+      }
       g_svg
-        .append("a")
-        .attr("xlink:href",g_person_url_prefix+person.id)
-        .append("text")
-        .attr("transform", "translate("+(person.name_pos.x-5)+","+(person.name_pos.y-5)+") rotate(-45)")
-        .attr("text-anchor","end")
-        .attr("class", "person-text")
-        .style("fill", person.color)
+        .append('a')
+        .attr('xlink:href',g_person_url_prefix+person.id)
+        .append('text')
+        .attr('transform', 'translate('+(person.name_pos.x-5)+','+(person.name_pos.y-5)+') rotate(-45)')
+        .attr('text-anchor','end')
+        .attr('class', 'person-text')
+        .style('fill', person.color)
         .text(person.name)
       ;
     }
@@ -310,87 +312,87 @@ var Narrative = function() {
     for (i=0;i<g_events.length;i++) {
       event = g_events[i];
       g_svg
-        .append("ellipse")
-        .attr("cx", event.cx)
-        .attr("cy", event.cy)
-        .attr("rx", event.rx)
-        .attr("ry", event.ry)
-        .attr("class", "event")
-        .attr("id","E"+event.id)
-        .on("click", function() { event_popup(this.id.substr(1), d3.mouse(this)); });
+        .append('ellipse')
+        .attr('cx', event.cx)
+        .attr('cy', event.cy)
+        .attr('rx', event.rx)
+        .attr('ry', event.ry)
+        .attr('class', 'event')
+        .attr('id','E'+event.id)
+        .on('click', function() { event_popup(this.id.substr(1), d3.mouse(this)); });
     }
   }
 
   function draw_event_labels() {
-    var event, i, style;
+    var event, i;
     for (i=0;i<g_events.length;i++) {
       event = g_events[i];
       if (!g_main_person || index_person_in_event(g_main_person,event)!==-1) {
         g_svg
-          .append("a")
-          .attr("xlink:href",g_event_url_prefix+event.id)
-          .append("text")
-          .attr("transform", "translate("+(event.cx+10)+","+(event.cy-event.ry)+") rotate(-70)")
-          .attr("text-anchor", "start")
-          .attr("class", "event-text")
+          .append('a')
+          .attr('xlink:href',g_event_url_prefix+event.id)
+          .append('text')
+          .attr('transform', 'translate('+(event.cx+10)+','+(event.cy-event.ry)+') rotate(-70)')
+          .attr('text-anchor', 'start')
+          .attr('class', 'event-text')
           .text(abbreviate(event.title,20));
       }
     }
   }
 
   function draw_key(boxx, boxy, size) {
-    var i, svg = d3.select("#timeline"), popup_key, visible=false;
+    var i, svg = d3.select('#timeline'), popup_key, visible=false;
 
     function toggle_info() {
-      popup_key.style("display",visible?"none":"block");
+      popup_key.style('display',visible?'none':'block');
       visible=!visible;
     }
 
     svg
-      .append("g")
-      .attr("id","info-button")
-      .on("click",toggle_info)
-      .append("image")
-      .attr("x",10).attr("y",10)
-      .attr("width",20).attr("height",20)
-      .attr("xlink:href","/static/events/img/info.png")
+      .append('g')
+      .attr('id','info-button')
+      .on('click',toggle_info)
+      .append('image')
+      .attr('x',10).attr('y',10)
+      .attr('width',20).attr('height',20)
+      .attr('xlink:href','/static/events/img/info.png')
     ;
 
     popup_key = svg
-      .append("g")
-      .attr("id", "popup-key")
-      .style("display","none")
+      .append('g')
+      .attr('id', 'popup-key')
+      .style('display','none')
     ;
-    popup_key.append("rect")
-      .attr("x",boxx).attr("y",boxy)
-      .attr("width",200*size).attr("height",size*(14*(1+g_people.length)-5))
-      .attr("fill","black")
-      .attr("opacity",0.2)
+    popup_key.append('rect')
+      .attr('x',boxx).attr('y',boxy)
+      .attr('width',200*size).attr('height',size*(14*(1+g_people.length)-5))
+      .attr('fill','black')
+      .attr('opacity',0.2)
     ;
     for (i=0; i< g_people.length; i++) {
       popup_key
-        .append("a")
-        .attr("xlink:href",g_person_url_prefix+g_people[i].id)
-        .append("rect")
-        .attr("x",boxx+5).attr("y",boxy+7+14*i*size)
-        .attr("width",20*size).attr("height",12*size)
-        .attr("fill",g_people[i].color)
+        .append('a')
+        .attr('xlink:href',g_person_url_prefix+g_people[i].id)
+        .append('rect')
+        .attr('x',boxx+5).attr('y',boxy+7+14*i*size)
+        .attr('width',20*size).attr('height',12*size)
+        .attr('fill',g_people[i].color)
       ;
       popup_key
-        .append("a")
-        .attr("xlink:href",g_person_url_prefix+g_people[i].id)
-        .append("image")
-        .attr("x",boxx+20*size+10).attr("y",boxy+7+14*i*size)
-        .attr("width",20*size).attr("height",12*size)
-        .attr("xlink:href",g_people[i].photo)
+        .append('a')
+        .attr('xlink:href',g_person_url_prefix+g_people[i].id)
+        .append('image')
+        .attr('x',boxx+20*size+10).attr('y',boxy+7+14*i*size)
+        .attr('width',20*size).attr('height',12*size)
+        .attr('xlink:href',g_people[i].photo)
       ;
       popup_key
-        .append("a")
-        .attr("xlink:href",g_person_url_prefix+g_people[i].id)
-        .append("text")
-        .attr("x",boxx+40*size+10).attr("y",boxy+7+14*i*size+14*size/1.4)
-        .attr("font-family","sans-serif")
-        .attr("font-size",14*size)
+        .append('a')
+        .attr('xlink:href',g_person_url_prefix+g_people[i].id)
+        .append('text')
+        .attr('x',boxx+40*size+10).attr('y',boxy+7+14*i*size+14*size/1.4)
+        .attr('font-family','sans-serif')
+        .attr('font-size',14*size)
         .text(g_people[i].name)
       ;
     }
@@ -398,7 +400,7 @@ var Narrative = function() {
 
   function pan_to(x,y) {
     g_zoom.translate([-x+g_margin.left, -y+g_margin.top]);
-    g_svg.attr("transform", " translate(" + (-x+g_margin.left) + "," + (-y+g_margin.top) + ")");
+    g_svg.attr('transform', ' translate(' + (-x+g_margin.left) + ',' + (-y+g_margin.top) + ')');
   }
 
   function draw() {
@@ -415,8 +417,8 @@ var Narrative = function() {
   }
 
   this.draw_chart = function(person_id) {
-    d3.json("/events/api/event/", function(e) {
-      d3.json("/events/api/person/", function(p) {
+    d3.json('/events/api/event/', function(e) {
+      d3.json('/events/api/person/', function(p) {
         var i, j, timescale, time_axis, startDate, endDate, timeSpan, tickFormat;
         g_events = e.sort(function(e1,e2) { return new Date(e1.date) - new Date(e2.date); });
         g_people = p.filter(function(person) { return person.event_set.length>0; });
@@ -432,22 +434,22 @@ var Narrative = function() {
         }
 
         g_zoom = d3.behavior.zoom()
-          .scaleExtent([.1, 8])
-          .on("zoom", function () {
-            g_svg.attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
+          .scaleExtent([0.1, 8])
+          .on('zoom', function () {
+            g_svg.attr('transform', 'translate(' + d3.event.translate + ') scale(' + d3.event.scale + ')');
           });
 
 
         g_svg = d3
-          .select("#chart")
-          .append("svg")
-          .attr("xmlns:xmlns:xlink","http://www.w3.org/1999/xlink")
-          .attr("width", g_width)
-          .attr("height", g_height)
-          .attr("id", "timeline")
-          .append("g")
+          .select('#chart')
+          .append('svg')
+          .attr('xmlns:xmlns:xlink','http://www.w3.org/1999/xlink')
+          .attr('width', g_width)
+          .attr('height', g_height)
+          .attr('id', 'timeline')
+          .append('g')
           .call(g_zoom)
-          .append("g")
+          .append('g')
         ;
 
         pan_to(-20,0);
@@ -465,14 +467,14 @@ var Narrative = function() {
         ;
         if (timeSpan < 86400000) {
           // less than a day
-          tickFormat = "%H:%M";
+          tickFormat = '%H:%M';
         } else {
           if (timeSpan < 31536000000) {
             // less than a year
-            tickFormat = "%d %B";
+            tickFormat = '%d %B';
           } else {
             // multiple years
-            tickFormat = "%Y";
+            tickFormat = '%Y';
           }
         }
         time_axis = d3.svg.axis()
@@ -482,7 +484,7 @@ var Narrative = function() {
         ;
 
         g_svg
-          .append("rect")
+          .append('rect')
           .attr('fill','#ddd')
           .attr('x',-100000)
           .attr('y',-100000)
@@ -490,7 +492,7 @@ var Narrative = function() {
           .attr('height',200000);
 
         // axis
-        g_svg.append("g")
+        g_svg.append('g')
           .attr('class', 'axis')
           .attr('transform','translate(0,'+(-g_margin.top+3)+')')
           .call(time_axis);
