@@ -14,16 +14,16 @@
         <h1>{{ instance_settings.title }}</h1>
         <p>{{ instance_settings.description }}</p>
         <p>Drag/slide to pan, scroll/pinch to zoom, click/tap on objects or lines for details</p>
-      <div id="chart">
-
+        <div id="chart"></div>
+        <div id="chart2"></div>
     </div>
-
     <script src="{% static 'events/js/d3.v3.min.js' %}"></script>
     <script src="{% static 'events/js/narrative.js' %}"></script>
     <script>
-      var n=new Narrative(); 
+      var n=new Narrative('chart', 'horizontal');
       n.draw_chart();
+      var n2=new Narrative('chart2', 'vertical');
+      n2.draw_chart();
     </script>
   </body>
 </html>
-

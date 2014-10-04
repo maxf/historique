@@ -41,7 +41,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'south',
     'events'
 )
 
@@ -99,27 +98,27 @@ REST_FRAMEWORK = {
 
 
 ##########################################
-LANGUAGE_CODE = "en-GB"
-TIME_ZONE = "GMT"
+LANGUAGE_CODE = "fr-FR"
+TIME_ZONE = "Europe/Paris"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = False
 
 INSTANCE_SETTINGS =  {
-    "title": "Raiders of the Lost Ark",
-    "description": "An instance of Historique (See 'about' above), a generic timeline visualisation too, showing a timeline of the film.",
-    "people": "Characters",
-    "events": "Scenes",
-    "no_events": "No scenes",
-    "no_people": "No characters",
-    "links": "Links",
-    "comments": "Comments",
-    "no_comments": "No comments yet",
-    "add_comment": "Add a comment",
-    "send": "Send",
+    "title": "Famille Froumentin",
+    "description": "Historique des Froumentin",
+    "people": "Personnes",
+    "events": "Événement",
+    "no_events": "Pas d'événement",
+    "no_people": "Personne",
+    "links": "Liens",
+    "comments": "Commentaires",
+    "no_comments": "Pas de commentaires",
+    "add_comment": "Ajouter un commentaire",
+    "send": "Envoyer",
 
     "features_enabled": {
-        "comments": False
+        "comments": True
     }
 
 }
