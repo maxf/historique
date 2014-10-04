@@ -421,6 +421,12 @@ Narrative = function() {
       d3.json('/events/api/person/', function(p) {
         var i, j, timescale, time_axis, startDate, endDate, timeSpan, tickFormat;
         g_events = e.sort(function(e1,e2) { return new Date(e1.date) - new Date(e2.date); });
+
+        // remove events with no participants
+        g_events = g_events.filter(function(e) {
+          return e.people.length > 0;
+        });
+
         g_people = p.filter(function(person) { return person.event_set.length>0; });
         g_people.sort(function(a,b) { return b.event_set.length - a.event_set.length; });
 
