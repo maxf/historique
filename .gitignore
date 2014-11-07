@@ -2,4 +2,4 @@ venv
 *.pyc
 staticfiles
 .DS_Store
-.tern_port
+.tern-port
