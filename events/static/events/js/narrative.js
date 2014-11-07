@@ -4,6 +4,12 @@ var d3, Narrative;
 Narrative = function(anchor, layout) {
   'use strict';
 
+// Notes:
+// Every object's 2d position is along two axes: t (the timeline) and z (where objects are places)
+// Only when we draw the shapes do we finally convert to x and y, according to whether the type is
+// horizontal or vertuical
+
+
   var
     g_vertical = layout === 'vertical',
     g_person_url_prefix = '/events/person/',
@@ -29,6 +35,15 @@ Narrative = function(anchor, layout) {
      g_height = 500;
   }
 
+
+  function x(t,z) {
+    return g_vertical ? z : t;
+  }
+
+  function y(t,z) {
+    return g_vertical ? t : z;
+  }
+
   // The API returns dates as 2014-05-15T00:00:00Z. We need to map that
   // to time axis interval [min(date), max(date)]
   function dateToInt(date_string) {
@@ -42,14 +57,14 @@ Narrative = function(anchor, layout) {
     return d3.rgb(grey, grey, grey);
   }
 
-  function get_path(x0,y0,x1,y1) {
-    var xi = d3.interpolateNumber(x0, x1),
-        x2 = xi(g_curvature),
-        x3 = xi(1 - g_curvature);
-    return ' M' + x0 + ',' + y0 +
-           ' C' + x2 + ',' + y0 +
-           ' ' + x3 + ',' + y1 +
-           ' ' + x1 + ',' + y1;
+  function get_path(t0, z0, t1, z1) {
+    var itrp = d3.interpolateNumber(t0, t1),
+        t2 = itrp(g_curvature),
+        t3 = itrp(1 - g_curvature);
+    return ' M' + x(t0, z0) + ',' + y(t0, z0) +
+           ' C' + x(t2, z0) + ',' + y(t2, z0) +
+           '  ' + x(t3, z1) + ',' + y(t3, z1) +
+           '  ' + x(t1, z1) + ',' + y(t1, z1);
   }
 
   function index_person_in_event(person, event) {
@@ -179,8 +194,8 @@ Narrative = function(anchor, layout) {
   }
 
   // returns y position of idx'th person in event
-  function event_person_y(event, idx) {
-    return (event.cy - event.ry + g_people_spacing_in_event/2) + idx * g_people_spacing_in_event;
+  function event_person_z(event, idx) {
+    return (event.cz - event.rz + g_people_spacing_in_event/2) + idx * g_people_spacing_in_event;
   }
 
   // return index of person in event
@@ -195,11 +210,11 @@ Narrative = function(anchor, layout) {
   }
 
   function calc_people_chart_data() {
-    var person, event, previous_event, i, j, idx, previdx, thisy, prevy, first_event_x, first_event_y;
+    var person, event, previous_event, i, j, idx, previdx, thisz, prevz, first_event_t, first_event_z;
     // Trace each person's timeline
     for (i=0; i<g_people.length; i++) {
       person = g_people[i];
-      person.circles = [];
+      person.discs = [];
       previous_event = null;
       person.path = '';
       for (j=0; j<g_events.length; j++) {
@@ -208,22 +223,22 @@ Narrative = function(anchor, layout) {
         if (idx !== -1) {
           if (previous_event) {
             // trace person's line from event to previous_event
-            prevy = event_person_y(previous_event, previdx);
-            thisy = event_person_y(event, idx);
-            person.path += get_path(previous_event.cx, prevy, event.cx, thisy);
-            person.circles.push({x:event.cx, y:thisy});
+            prevz = event_person_z(previous_event, previdx);
+            thisz = event_person_z(event, idx);
+            person.path += get_path(previous_event.ct, prevz, event.ct, thisz);
+            person.discs.push({t:event.ct, z:thisz});
           } else {
             // the person's first event - write their name
-            first_event_x = event.cx;
-            first_event_y = event_person_y(event, idx);
+            first_event_t = event.ct;
+            first_event_z = event_person_z(event, idx);
             // if this is a single person's timeline, remember first event for initial zoom
             if (person === g_main_person) {
-              g_main_person_first_event_pos = {x:first_event_x, y:first_event_y};
+              g_main_person_first_event_pos = {t:first_event_t, z:first_event_z};
             }
-            person.circles.push({x:first_event_x, y:first_event_y});
+            person.discs.push({t:first_event_t, z:first_event_z});
             person.name_pos = {
-              y: event.cy - event.ry + (idx+1)*g_people_spacing_in_event,
-              x: event.cx - 5
+              t: event.ct - 5,
+              z: event.cz - event.rz + (idx+1)*g_people_spacing_in_event
             };
           }
           previous_event = event;
@@ -235,7 +250,7 @@ Narrative = function(anchor, layout) {
   }
 
   function draw_people() {
-    var i, j, person, style, color, radius;
+    var i, j, person, style, color, radius, namepos_x, namepos_y;
     for (i=g_people.length-1; i>=0; i--) {
       person = g_people[i];
       if (person.path !== '') {
@@ -256,7 +271,7 @@ Narrative = function(anchor, layout) {
             person_popup(this.id.substr(1), d3.mouse(this));
           });
         }
-      for (j=0;j<g_people[i].circles.length;j++) {
+      for (j=0;j<g_people[i].discs.length;j++) {
         radius = Math.sqrt(4*g_people_spacing_in_event);
         if (g_main_person && person!==g_main_person) {
           radius/=3;
@@ -265,16 +280,13 @@ Narrative = function(anchor, layout) {
           color = person.color;
         }
 
-        var cx = person.circles[j].x, cy = person.circles[j].y;
-        if (g_vertical) {
-          var tmp = cx; cx = cy; cy = tmp;
-        }
+        var ct = person.discs[j].t, cz = person.discs[j].z;
 
         g_svg
           .append('circle')
           .style('fill', color)
-          .attr('cx', cx)
-          .attr('cy', cy)
+          .attr('cx', x(ct,cz))
+          .attr('cy', y(ct,cz))
           .attr('r', radius)
           .on('click', function() {
             person_popup(this.id.substr(1), d3.mouse(this));
@@ -287,12 +299,14 @@ Narrative = function(anchor, layout) {
       if (g_main_person && person!==g_main_person) {
         continue;
       }
+      namepos_x = x(person.name_pos.t, person.name_pos.z);
+      namepos_y = y(person.name_pos.t, person.name_pos.z);
       g_svg
         .append('a')
         .attr('xlink:href',g_person_url_prefix+person.id)
         .append('text')
-        .attr('transform', 'translate('+(person.name_pos.x-5)+','+
-              (person.name_pos.y-5)+') rotate(-45)')
+        .attr('transform', 'translate('+(namepos_x-5)+','+
+              (namepos_y-5)+') rotate(-45)')
         .attr('text-anchor','end')
         .attr('class', 'person-text')
         .style('fill', person.color)
@@ -308,21 +322,21 @@ Narrative = function(anchor, layout) {
 
     for (i=0;i<g_events.length;i++) {
       event = g_events[i];
-      event.cx = (event.dateInt - g_min_date) * g_width / event_date_range;
-      event.ry = g_people_spacing_in_event*event.people.length/2;
-      event.rx = g_people_spacing_in_event/2;
+      event.ct = (event.dateInt - g_min_date) * g_width / event_date_range;
+      event.rz = g_people_spacing_in_event*event.people.length/2;
+      event.rt = g_people_spacing_in_event/2;
       // adjust event if needed
       if (g_main_person && (main_person_index_in_event = index_of_person_in_event(event, g_main_person)) !== -1) {
-        event.cy = g_main_person.default_pos - g_people_spacing_in_event * (main_person_index_in_event-(event.people.length-1)/2);
+        event.cz = g_main_person.default_pos - g_people_spacing_in_event * (main_person_index_in_event-(event.people.length-1)/2);
       } else {
-        // we compute an event's Y by averaging the default_pos of its participants
+        // we compute an event's Z by averaging the default_pos of its participants
         sum_default_pos = 0;
 
         for (j=0; j<event.people.length; j++) {
           person = event.people[j];
           sum_default_pos += person.default_pos;
         }
-        event.cy = sum_default_pos / event.people.length;
+        event.cz = sum_default_pos / event.people.length;
       }
     }
   }
@@ -331,12 +345,13 @@ Narrative = function(anchor, layout) {
     var i, event;
     for (i=0;i<g_events.length;i++) {
       event = g_events[i];
+      console.log(event.ct, event.cz);
       g_svg
         .append('ellipse')
-        .attr('cx', event.cx)
-        .attr('cy', event.cy)
-        .attr('rx', event.rx)
-        .attr('ry', event.ry)
+        .attr('cx', x(event.ct, event.cz))
+        .attr('cy', y(event.ct, event.cz))
+        .attr('rx', x(event.rt, event.rz))
+        .attr('ry', y(event.rt, event.rz))
         .attr('class', 'event')
         .attr('id','E'+event.id)
         .on('click', function() { event_popup(this.id.substr(1), d3.mouse(this)); });
@@ -344,15 +359,17 @@ Narrative = function(anchor, layout) {
   }
 
   function draw_event_labels() {
-    var event, i;
+    var event, i, ex, ey;
     for (i=0;i<g_events.length;i++) {
       event = g_events[i];
       if (!g_main_person || index_person_in_event(g_main_person,event)!==-1) {
+        ex = x(event.ct, event.cz),
+        ey = y(event.ct, event.cz),
         g_svg
           .append('a')
           .attr('xlink:href',g_event_url_prefix+event.id)
           .append('text')
-          .attr('transform', 'translate('+(event.cx+10)+','+(event.cy-event.ry)+') rotate(-70)')
+          .attr('transform', 'translate('+(ex+10)+','+(ey-10)+') rotate(-70)')
           .attr('text-anchor', 'start')
           .attr('class', 'event-text')
           .text(abbreviate(event.title,20));
