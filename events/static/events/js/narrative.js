@@ -27,11 +27,11 @@ Narrative = function(anchor, layout) {
 
 
   if (g_vertical) {
-     g_width = 500;
+     g_width = 1000;
      g_height = 2000;
   } else {
      g_width = 2000;
-     g_height = 500;
+     g_height = 1000;
   }
 
 
@@ -249,7 +249,8 @@ Narrative = function(anchor, layout) {
   }
 
   function draw_people() {
-    var i, j, person, style, color, radius, namepos_x, namepos_y;
+    var i, j, person, style, color, radius,
+      ct, cz, angle, lx, ly;
     for (i=g_people.length-1; i>=0; i--) {
       person = g_people[i];
       if (person.path !== '') {
@@ -279,7 +280,8 @@ Narrative = function(anchor, layout) {
           color = person.color;
         }
 
-        var ct = person.discs[j].t, cz = person.discs[j].z;
+        ct = person.discs[j].t;
+        cz = person.discs[j].z;
 
         g_svg
           .append('circle')
@@ -298,14 +300,20 @@ Narrative = function(anchor, layout) {
       if (g_main_person && person!==g_main_person) {
         continue;
       }
-      namepos_x = x(person.name_pos.t, person.name_pos.z);
-      namepos_y = y(person.name_pos.t, person.name_pos.z);
+      if (g_vertical) {
+        angle = 0;
+        lx = person.name_pos.z-10;
+        ly = person.name_pos.t+20;
+      } else {
+        angle = -70;
+        lx = person.name_pos.t;
+        ly = person.name_pos.z;
+      }
       g_svg
         .append('a')
         .attr('xlink:href',g_person_url_prefix+person.id)
         .append('text')
-        .attr('transform', 'translate('+(namepos_x-5)+','+
-              (namepos_y-5)+') rotate(-45)')
+        .attr('transform', 'translate('+lx+','+ly+') rotate(-45)')
         .attr('text-anchor','end')
         .attr('class', 'person-text')
         .style('fill', person.color)
@@ -358,17 +366,24 @@ Narrative = function(anchor, layout) {
   }
 
   function draw_event_labels() {
-    var event, i, ex, ey;
+    var event, i, ex, ey, angle;
     for (i=0;i<g_events.length;i++) {
       event = g_events[i];
       if (!g_main_person || index_person_in_event(g_main_person,event)!==-1) {
-        ex = x(event.ct, event.cz),
-        ey = y(event.ct, event.cz),
+        if (g_vertical) {
+          angle = 0;
+          ex = event.cz+event.rz;
+          ey = event.ct;
+        } else {
+          angle = -70;
+          ex = event.ct;
+          ey = event.cz-event.rz;
+        }
         g_svg
           .append('a')
           .attr('xlink:href',g_event_url_prefix+event.id)
           .append('text')
-          .attr('transform', 'translate('+(ex+10)+','+(ey-10)+') rotate(-70)')
+          .attr('transform', 'translate('+ex+','+ey+') rotate('+angle+')')
           .attr('text-anchor', 'start')
           .attr('class', 'event-text')
           .text(abbreviate(event.title,20));
