@@ -16,10 +16,9 @@ Narrative = function(anchor, layout) {
     g_event_url_prefix = '/events/event/',
     g_svg,
     g_events, g_people,
-    g_zoom,
     g_width,
     g_height,
-    g_margin = {bottom: 0, top: 100, left: 100, right: 100},
+    g_margin = { start_t: 100, start_z: 20 },
     g_curvature = 0.3,
     g_color_scale = d3.scale.category20(),
     g_people_spacing_in_event = 17,
@@ -436,8 +435,11 @@ Narrative = function(anchor, layout) {
   }
 
   function pan_to(x,y) {
-    g_zoom.translate([-x+g_margin.left, -y+g_margin.top]);
-    g_svg.attr('transform', ' translate(' + (-x+g_margin.left) + ',' + (-y+g_margin.top) + ')');
+    if (g_vertical) {
+      g_svg.attr('transform', ' translate(' + (-x+g_margin.start_z) + ',' + (-y+g_margin.start_t) + ')');
+    } else {
+      g_svg.attr('transform', ' translate(' + (-x+g_margin.start_t) + ',' + (-y+g_margin.start_z) + ')');
+    }
   }
 
   function draw_everything() {
@@ -494,14 +496,6 @@ Narrative = function(anchor, layout) {
           });
         }
 
-        // create zoom object
-        g_zoom = d3.behavior.zoom()
-          .scaleExtent([0.1, 8])
-          .on('zoom', function () {
-            g_svg.attr('transform', 'translate(' + d3.event.translate +
-                       ') scale(' + d3.event.scale + ')');
-          });
-
         // create svg for the chart
         g_svg = d3
           .select('#'+anchor)
@@ -510,8 +504,6 @@ Narrative = function(anchor, layout) {
           .attr('width', g_width)
           .attr('height', g_height)
           .attr('id', 'timeline')
-          .append('g')
-          .call(g_zoom)
           .append('g')
         ;
 
@@ -544,7 +536,7 @@ Narrative = function(anchor, layout) {
         }
         time_axis = d3.svg.axis()
           .scale(timescale)
-          .orient(g_vertical?'left':'bottom')
+          .orient(g_vertical?'right':'bottom')
           .tickFormat(d3.time.format(tickFormat))
           // should depend on domain width
         ;
@@ -561,9 +553,6 @@ Narrative = function(anchor, layout) {
         // draw time axis
         g_svg.append('g')
           .attr('class', 'axis')
-          .attr('transform',g_vertical?
-            'translate(0,'+(-g_margin.top+3)+')':
-            'translate('+(-g_margin.left+3)+',0)')
           .call(time_axis);
 
         // time calculations (todo: use timescale)
