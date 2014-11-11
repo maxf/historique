@@ -9,6 +9,19 @@ Narrative = function(anchor, layout) {
 // Only when we draw the shapes do we finally convert to x and y, according to whether the type is
 // horizontal or vertuical
 
+  var g_width, g_height, g_size={};
+
+  if (g_vertical) {
+     g_width = 1000;
+     g_height = 2000;
+     g_size.t = g_height;
+     g_size.z = g_width;
+  } else {
+     g_width = 2000;
+     g_height = 1000;
+     g_size.t = g_width;
+     g_size.z = g_height;
+  }
 
   var
     g_vertical = layout === 'vertical',
@@ -16,32 +29,17 @@ Narrative = function(anchor, layout) {
     g_event_url_prefix = '/events/event/',
     g_svg,
     g_events, g_people,
-    g_width,
-    g_height,
     g_margin = { start_t: 100, start_z: 20 },
     g_curvature = 0.3,
     g_color_scale = d3.scale.category20(),
     g_people_spacing_in_event = 17,
     g_main_person, g_main_person_first_event_pos,
-    g_min_date, g_max_date;
+    g_min_date, g_max_date,
+    g_timescale, g_zscale;
 
 
-  if (g_vertical) {
-     g_width = 1000;
-     g_height = 2000;
-  } else {
-     g_width = 2000;
-     g_height = 1000;
-  }
-
-
-  function x(t,z) {
-    return g_vertical ? z : t;
-  }
-
-  function y(t,z) {
-    return g_vertical ? t : z;
-  }
+  function x(t,z) { return g_vertical ? z : t; }
+  function y(t,z) { return g_vertical ? t : z; }
 
   // The API returns dates as 2014-05-15T00:00:00Z. We need to map that
   // to time axis interval [min(date), max(date)]
@@ -329,7 +327,7 @@ Narrative = function(anchor, layout) {
 
     for (i=0;i<g_events.length;i++) {
       event = g_events[i];
-      event.ct = (event.dateInt - g_min_date) * g_width / event_date_range;
+      event.ct = g_timescale(event.dateInt);
       event.rz = g_people_spacing_in_event*event.people.length/2;
       event.rt = g_people_spacing_in_event/2;
       // adjust event if needed
@@ -352,7 +350,6 @@ Narrative = function(anchor, layout) {
     var i, event;
     for (i=0;i<g_events.length;i++) {
       event = g_events[i];
-      console.log(event.ct, event.cz);
       g_svg
         .append('ellipse')
         .attr('cx', x(event.ct, event.cz))
@@ -476,7 +473,7 @@ Narrative = function(anchor, layout) {
   this.draw_chart = function(person_id) {
     d3.json('/events/api/event/', function(e) {
       d3.json('/events/api/person/', function(p) {
-        var i, j, timescale, time_axis, startDate, endDate, timeSpan, tickFormat;
+        var i, j, time_axis, startDate, endDate, timeSpan, tickFormat;
 
         // sort events by data
         g_events = e.sort(function(e1,e2) {
@@ -522,20 +519,20 @@ Narrative = function(anchor, layout) {
           .append('g')
         ;
 
-        if (g_vertical) {
-          pan_to(0,-20);
-        } else {
-          pan_to(-20,0);
-        }
-
+//        if (g_vertical) {
+//          pan_to(0,-20);
+//        } else {
+//          pan_to(-20,0);
+//        }
+//
         // draw time axis
         startDate = new Date(g_events[0].date);
         endDate = new Date(g_events[g_events.length-1].date);
         timeSpan = endDate-startDate; // milliseconds
-        timescale = d3.time.scale()
+        g_timescale = d3.time.scale()
           .domain([startDate, endDate])
-          .range(g_vertical?[0,g_height]:[0,g_width])
-        // .nice(d3.time.year) // should depend on domain width
+          .range([0, g_size.t])
+          .nice(d3.time.year) // should depend on domain width
         ;
         if (timeSpan < 86400000) {
           // less than a day
@@ -546,14 +543,14 @@ Narrative = function(anchor, layout) {
             tickFormat = '%d %B';
           } else {
             // multiple years
-            tickFormat = '%Y';
+            tickFormat = '%Y-%m';
           }
         }
         time_axis = d3.svg.axis()
-          .scale(timescale)
+          .scale(g_timescale)
           .orient(g_vertical?'right':'bottom')
           .tickFormat(d3.time.format(tickFormat))
-          // should depend on domain width
+          .ticks(d3.time.year, 5)
         ;
 
         // background colour
@@ -581,8 +578,7 @@ Narrative = function(anchor, layout) {
         for (j=0;j<g_people.length;j++) {
           // a person's default_pos is that person's default position
           // in the chart
-          g_people[j].default_pos = (g_vertical?g_width:g_height) * (j+1) /
-            (g_people.length+1);
+          g_people[j].default_pos = g_size.z * (j+1) / (g_people.length+1);
           // todo: use d3.scale.ordinal
         }
 
