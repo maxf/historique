@@ -61,8 +61,10 @@
   fill: #AD9707;
 }
 
-#chart {
-  border: 3px solid black;
-  width: 2010px;
-  margin-right: 200px;
+
+.label-year {
+  fill: black;
+  font-family: sans-serif;
+  font-size: 20;
+  text-anchor: middle;
 }

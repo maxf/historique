@@ -11,35 +11,48 @@ Narrative = function(anchor, layout) {
 
   var g_width, g_height, g_size={};
 
-  if (g_vertical) {
-     g_width = 1000;
-     g_height = 2000;
-     g_size.t = g_height;
-     g_size.z = g_width;
-  } else {
-     g_width = 2000;
-     g_height = 1000;
-     g_size.t = g_width;
-     g_size.z = g_height;
-  }
-
   var
     g_vertical = layout === 'vertical',
     g_person_url_prefix = '/events/person/',
     g_event_url_prefix = '/events/event/',
     g_svg,
     g_events, g_people,
-    g_margin = { start_t: 100, start_z: 20 },
+    g_margin = { start_t: 50, start_z: 20 },
     g_curvature = 0.3,
     g_color_scale = d3.scale.category20(),
     g_people_spacing_in_event = 17,
-    g_main_person, g_main_person_first_event_pos,
     g_min_date, g_max_date,
-    g_timescale, g_zscale;
+    g_timescale, g_zscale,
+    g_startDate, g_endDate,
+    g_drag;
 
+
+    g_drag = d3.behavior.drag()
+      .on("drag", function(event) {
+        var i, person, ct, cz;
+        event.cz = z(d3.event.x, d3.event.y);
+        d3.select(this)
+          .attr('cy', d3.event.y)
+        ;
+        // recalculate the path of the people who are in that event
+        for (i=0; i<event.people.length; i++) {
+          person = event.people[i];
+          d3.select('#P'+person.id).attr('d', person_path(person));
+          // relocate the perosn's disc with id disc-[person.id]-[event.id]
+          ct = event.ct;
+          cz = event_person_z(event, index_person_in_event(person, event));
+          d3.select('#D'+person.id+'-'+event.id)
+            .attr('cx', x(ct,cz))
+            .attr('cy', y(ct,cz))
+          ;
+        }
+      })
+      ;
 
   function x(t,z) { return g_vertical ? z : t; }
   function y(t,z) { return g_vertical ? t : z; }
+  function z(x,y) { return g_vertical ? x : y; }
+  function t(x,y) { return g_vertical ? y : x; }
 
   // The API returns dates as 2014-05-15T00:00:00Z. We need to map that
   // to time axis interval [min(date), max(date)]
@@ -174,11 +187,7 @@ Narrative = function(anchor, layout) {
   function person_popup(person_id, mouse) {
     var person, color;
     person = find_person_by_id(person_id);
-    if (g_main_person && person!==g_main_person) {
-      color = to_grey(person.color);
-    } else {
-      color = person.color;
-    }
+    color = person.color;
     tooltip(person.name, person.photo, g_person_url_prefix+person_id, mouse[0], mouse[1], color);
   }
 
@@ -206,122 +215,148 @@ Narrative = function(anchor, layout) {
     return -1;
   }
 
+  // perform various computations before drawing
+  function prepare_events_people() {
+    var i;
+    // time calculations (todo: use timescale)
+    g_min_date=9999999999999; g_max_date=0;
+    for (i = 0; i < g_events.length; i++) {
+      g_events[i].dateInt = dateToInt(g_events[i].date);
+      g_min_date = Math.min(g_min_date, g_events[i].dateInt);
+      g_max_date = Math.max(g_max_date, g_events[i].dateInt);
+    }
+
+    for (i=0;i<g_people.length;i++) {
+       // a person's default_pos is that person's default position
+       // in the chart
+       g_people[i].default_pos = g_size.z * (i+1) / (g_people.length+1);
+       // todo: use d3.scale.ordinal
+    }
+  }
+
+  function person_path(person) {
+    var previous_event = null;
+    var path = '';
+    var person_events = g_events.filter(function(event) { return event.people.indexOf(person) !== -1; });
+    var event;
+    var i, idx, prevz, thisz, previdx, first_event_t, first_event_z;
+
+    for (i=0; i<person_events.length; i++) {
+      event = person_events[i];
+      idx = index_person_in_event(person, event);
+      if (idx !== -1) {
+        if (previous_event) {
+          // trace person's line from event to previous_event
+          prevz = event_person_z(previous_event, previdx);
+          thisz = event_person_z(event, idx);
+          path += get_path(previous_event.ct, prevz, event.ct, thisz);
+        } else {
+          // the person's first event - write their name
+          first_event_t = event.ct;
+          first_event_z = event_person_z(event, idx);
+          // if this is a single person's timeline, remember first event for initial zoom
+//          person.name_pos = {
+//            t: event.ct - 5,
+//            z: event.cz - event.rz + (idx+1)*g_people_spacing_in_event
+//          };
+        }
+        previous_event = event;
+        previdx = idx;
+      }
+    }
+    return path;
+  }
+
+
   function calc_people_chart_data() {
-    var person, event, previous_event, i, j, idx, previdx, thisz, prevz, first_event_t, first_event_z;
+    var person, event, person_events, i, j, idx, previdx, thisz, prevz, first_event_t, first_event_z;
     // Trace each person's timeline
     for (i=0; i<g_people.length; i++) {
       person = g_people[i];
-      person.discs = [];
-      previous_event = null;
-      person.path = '';
+      person.path = person_path(person);
+      person.color = d3.rgb(g_color_scale(person.id)).darker(0.5);
+      person_events = [];
       for (j=0; j<g_events.length; j++) {
         event = g_events[j];
-        idx = index_person_in_event(person, event);
-        if (idx !== -1) {
-          if (previous_event) {
-            // trace person's line from event to previous_event
-            prevz = event_person_z(previous_event, previdx);
-            thisz = event_person_z(event, idx);
-            person.path += get_path(previous_event.ct, prevz, event.ct, thisz);
-            person.discs.push({t:event.ct, z:thisz});
-          } else {
-            // the person's first event - write their name
-            first_event_t = event.ct;
-            first_event_z = event_person_z(event, idx);
-            // if this is a single person's timeline, remember first event for initial zoom
-            if (person === g_main_person) {
-              g_main_person_first_event_pos = {t:first_event_t, z:first_event_z};
-            }
-            person.discs.push({t:first_event_t, z:first_event_z});
-            person.name_pos = {
-              t: event.ct - 5,
-              z: event.cz - event.rz + (idx+1)*g_people_spacing_in_event
-            };
-          }
-          previous_event = event;
-          previdx = idx;
+        if (event.people.indexOf(person) !== -1) {
+          person_events.push(event);
         }
       }
-      person.color = d3.rgb(g_color_scale(person.id)).darker(0.5);
     }
   }
 
+
   function draw_people() {
-    var i, j, person, style, color, radius,
-      ct, cz, angle, lx, ly;
+    var i, j, person, person_group, radius,
+      ct, cz, angle, group, person_events, event;
+    g_svg.select('#people').remove();
+    group = g_svg.append('g').attr('id', 'people');
     for (i=g_people.length-1; i>=0; i--) {
+      person_group = group.append('g');
       person = g_people[i];
       if (person.path !== '') {
-        if (g_main_person && person!==g_main_person) {
-          style = 'not-main-person-path';
-          color = to_grey(person.color);
-        } else {
-          style = 'person-path';
-          color = person.color;
-        }
-        g_svg
+        person_group
+          .attr('class', 'person')
           .append('path')
           .attr('d', person.path)
-          .attr('class', style)
-          .style('stroke', color)
+          .attr('class', 'person-path')
+          .style('stroke', person.color)
           .attr('id', 'P'+person.id)
-          .on('click', function() {
-            person_popup(this.id.substr(1), d3.mouse(this));
-          });
-        }
-      for (j=0;j<g_people[i].discs.length;j++) {
-        radius = Math.sqrt(4*g_people_spacing_in_event);
-        if (g_main_person && person!==g_main_person) {
-          radius/=3;
-          color = to_grey(person.color);
-        } else {
-          color = person.color;
-        }
+//          .on('click', function() {
+//            person_popup(this.id.substr(1), d3.mouse(this));
+//          })
+        ;
+      }
 
-        ct = person.discs[j].t;
-        cz = person.discs[j].z;
+      radius = Math.sqrt(4*g_people_spacing_in_event);
 
-        g_svg
-          .append('circle')
-          .style('fill', color)
+      person_events = g_events.filter(function(event) { return event.people.indexOf(person) !== -1; });
+      for (j=0; j<person_events.length; j++) {
+        event = person_events[j];
+        ct = event.ct;
+        cz = event_person_z(event, index_person_in_event(person, event));
+        person_group.append('circle')
+          .attr('id', 'D'+person.id+'-'+event.id)
+          .style('fill', person.color)
           .attr('cx', x(ct,cz))
           .attr('cy', y(ct,cz))
           .attr('r', radius)
-          .on('click', function() {
-            person_popup(this.id.substr(1), d3.mouse(this));
-          });
+        ;
       }
+
+////          .on('click', function() {
+////            person_popup(this.id.substr(1), d3.mouse(this));
+////          })
+//          ;
+//      }
     }
     // separate loop because we want to see all text in front
-    for (i=0; i<g_people.length; i++) {
-      person = g_people[i];
-      if (g_main_person && person!==g_main_person) {
-        continue;
-      }
-      if (g_vertical) {
-        angle = 0;
-        lx = person.name_pos.z-10;
-        ly = person.name_pos.t+20;
-      } else {
-        angle = -70;
-        lx = person.name_pos.t;
-        ly = person.name_pos.z;
-      }
-      g_svg
-        .append('a')
-        .attr('xlink:href',g_person_url_prefix+person.id)
-        .append('text')
-        .attr('transform', 'translate('+lx+','+ly+') rotate(-45)')
-        .attr('text-anchor','end')
-        .attr('class', 'person-text')
-        .style('fill', person.color)
-        .text(person.name)
-      ;
-    }
+//    for (i=0; i<g_people.length; i++) {
+//      person = g_people[i];
+//      if (g_vertical) {
+//        angle = 0;
+//        lx = person.name_pos.z-10;
+//        ly = person.name_pos.t+20;
+//      } else {
+//        angle = -70;
+//        lx = person.name_pos.t;
+//        ly = person.name_pos.z;
+//      }
+//      group
+//        .append('a')
+//        .attr('xlink:href',g_person_url_prefix+person.id)
+//        .append('text')
+//        .attr('transform', 'translate('+lx+','+ly+') rotate(-45)')
+//        .attr('text-anchor','end')
+//        .attr('class', 'person-text')
+//        .style('fill', person.color)
+//        .text(person.name)
+//      ;
+//    }
   }
 
   function calc_events_chart_data() {
-    var event, i, j, sum_default_pos, event_date_range, person, main_person_index_in_event;
+    var event, i, j, sum_default_pos, event_date_range, person;
 
     event_date_range = g_max_date - g_min_date;
 
@@ -331,60 +366,56 @@ Narrative = function(anchor, layout) {
       event.rz = g_people_spacing_in_event*event.people.length/2;
       event.rt = g_people_spacing_in_event/2;
       // adjust event if needed
-      if (g_main_person && (main_person_index_in_event = index_of_person_in_event(event, g_main_person)) !== -1) {
-        event.cz = g_main_person.default_pos - g_people_spacing_in_event * (main_person_index_in_event-(event.people.length-1)/2);
-      } else {
-        // we compute an event's Z by averaging the default_pos of its participants
-        sum_default_pos = 0;
+      // we compute an event's Z by averaging the default_pos of its participants
+      sum_default_pos = 0;
 
-        for (j=0; j<event.people.length; j++) {
-          person = event.people[j];
-          sum_default_pos += person.default_pos;
-        }
-        event.cz = sum_default_pos / event.people.length;
+      for (j=0; j<event.people.length; j++) {
+        person = event.people[j];
+        sum_default_pos += person.default_pos;
       }
+      event.cz = sum_default_pos / event.people.length;
     }
   }
+
 
   function draw_events() {
-    var i, event;
-    for (i=0;i<g_events.length;i++) {
-      event = g_events[i];
-      g_svg
+    g_svg
+      .append('g').attr('id', 'events').selectAll('g.event')
+        .data(g_events).enter()
+        .append('g').attr('class', 'event')
         .append('ellipse')
-        .attr('cx', x(event.ct, event.cz))
-        .attr('cy', y(event.ct, event.cz))
-        .attr('rx', x(event.rt, event.rz))
-        .attr('ry', y(event.rt, event.rz))
+        .attr('cx', function(event) { return x(event.ct, event.cz); })
+        .attr('cy', function(event) { return y(event.ct, event.cz); })
+        .attr('rx', function(event) { return x(event.rt, event.rz); })
+        .attr('ry', function(event) { return y(event.rt, event.rz); })
+        .attr('id', function(event) { return 'E'+event.id; })
         .attr('class', 'event')
-        .attr('id','E'+event.id)
-        .on('click', function() { event_popup(this.id.substr(1), d3.mouse(this)); });
-    }
+        .call(g_drag)
+    ;
   }
+
 
   function draw_event_labels() {
     var event, i, ex, ey, angle;
     for (i=0;i<g_events.length;i++) {
       event = g_events[i];
-      if (!g_main_person || index_person_in_event(g_main_person,event)!==-1) {
-        if (g_vertical) {
-          angle = 0;
-          ex = event.cz+event.rz;
-          ey = event.ct;
-        } else {
-          angle = -70;
-          ex = event.ct;
-          ey = event.cz-event.rz;
-        }
-        g_svg
-          .append('a')
-          .attr('xlink:href',g_event_url_prefix+event.id)
-          .append('text')
-          .attr('transform', 'translate('+ex+','+ey+') rotate('+angle+')')
-          .attr('text-anchor', 'start')
-          .attr('class', 'event-text')
-          .text(abbreviate(event.title,20));
+      if (g_vertical) {
+        angle = 0;
+        ex = event.cz+event.rz;
+        ey = event.ct;
+      } else {
+        angle = -70;
+        ex = event.ct;
+        ey = event.cz-event.rz;
       }
+      g_svg
+        .append('a')
+        .attr('xlink:href',g_event_url_prefix+event.id)
+        .append('text')
+        .attr('transform', 'translate('+ex+','+ey+') rotate('+angle+')')
+        .attr('text-anchor', 'start')
+        .attr('class', 'event-text')
+        .text(abbreviate(event.title,20));
     }
   }
 
@@ -454,17 +485,39 @@ Narrative = function(anchor, layout) {
     }
   }
 
+
+  function draw_axes() {
+    var i, startYear, endYear, time_axis, year_t, group;
+    time_axis = d3.svg.axis()
+      .scale(g_timescale)
+      .orient(g_vertical?'right':'bottom')
+      .tickFormat(d3.time.format(''))
+      .ticks(d3.time.year, 1)
+    ;
+    startYear = g_startDate.getFullYear();
+    endYear = g_endDate.getFullYear() + 1;
+
+    var group = g_svg.append('g')
+      .attr('class', 'axis')
+      .call(time_axis);
+    for (i=startYear-startYear%5; i<=endYear; i+=5) {
+      year_t = g_timescale(new Date(i,6));
+      group
+        .append('g')
+        .attr('class','label-year')
+        .append('text')
+        .attr('x', x(year_t, 25))
+        .attr('y', y(year_t, 25))
+        .text(i);
+    }
+  }
+
   function draw_everything() {
+    draw_axes();
     draw_people();
     draw_events();
-    draw_event_labels();
-    if (!g_main_person) {
-      draw_key(30,30,1.3);
-    }
-    if (g_main_person) {
-      pan_to(g_main_person_first_event_pos.x - 100,
-              g_main_person_first_event_pos.y - g_height/3);
-    }
+//    draw_event_labels();
+//    draw_key(30,30,1.3);
   }
 
 
@@ -473,7 +526,7 @@ Narrative = function(anchor, layout) {
   this.draw_chart = function(person_id) {
     d3.json('/events/api/event/', function(e) {
       d3.json('/events/api/person/', function(p) {
-        var i, j, time_axis, startDate, endDate, timeSpan, tickFormat;
+        var i, j, timeSpan, canvas_width, canvas_height;
 
         // sort events by data
         g_events = e.sort(function(e1,e2) {
@@ -496,8 +549,6 @@ Narrative = function(anchor, layout) {
           return b.event_set.length - a.event_set.length;
         });
 
-        g_main_person = find_person_by_id(person_id);
-
         // populate the event objects with people
         for (i=0; i<g_events.length; i++) {
           for (j=0; j<g_events[i].people.length; j++) {
@@ -509,50 +560,48 @@ Narrative = function(anchor, layout) {
         }
 
         // create svg for the chart
+
+        if (g_vertical) {
+          g_width = 500;
+          g_height = 3000;
+          g_size.t = g_height;
+          g_size.z = g_width;
+          canvas_width = g_size.z + 2*g_margin.start_z;
+          canvas_height = g_size.t + 2*g_margin.start_t;
+        } else {
+          g_width = 3000;
+          g_height = 500;
+          g_size.t = g_width;
+          g_size.z = g_height;
+          canvas_width = g_size.t + 2*g_margin.start_t;
+          canvas_height = g_size.z + 2*g_margin.start_z;
+        }
+
         g_svg = d3
           .select('#'+anchor)
           .append('svg')
           .attr('xmlns:xmlns:xlink','http://www.w3.org/1999/xlink')
-          .attr('width', g_width)
-          .attr('height', g_height)
+          .attr('height', canvas_height)
+          .attr('width', canvas_width)
           .attr('id', 'timeline')
           .append('g')
         ;
 
-//        if (g_vertical) {
-//          pan_to(0,-20);
-//        } else {
-//          pan_to(-20,0);
-//        }
-//
-        // draw time axis
-        startDate = new Date(g_events[0].date);
-        endDate = new Date(g_events[g_events.length-1].date);
-        timeSpan = endDate-startDate; // milliseconds
+        if (g_vertical) {
+          pan_to(0,-20);
+        } else {
+          pan_to(-20,0);
+        }
+
+        // time scale
+        g_startDate = new Date(g_events[0].date);
+        g_endDate = new Date(g_events[g_events.length-1].date);
+        timeSpan = g_endDate-g_startDate; // milliseconds
         g_timescale = d3.time.scale()
-          .domain([startDate, endDate])
-          .range([0, g_size.t])
+          .domain([g_startDate, g_endDate])
+          .rangeRound([0, g_size.t])
           .nice(d3.time.year) // should depend on domain width
         ;
-        if (timeSpan < 86400000) {
-          // less than a day
-          tickFormat = '%H:%M';
-        } else {
-          if (timeSpan < 31536000000) {
-            // less than a year
-            tickFormat = '%d %B';
-          } else {
-            // multiple years
-            tickFormat = '%Y-%m';
-          }
-        }
-        time_axis = d3.svg.axis()
-          .scale(g_timescale)
-          .orient(g_vertical?'right':'bottom')
-          .tickFormat(d3.time.format(tickFormat))
-          .ticks(d3.time.year, 5)
-        ;
-
         // background colour
         g_svg
           .append('rect')
@@ -562,26 +611,8 @@ Narrative = function(anchor, layout) {
           .attr('width',200000)
           .attr('height',200000);
 
-        // draw time axis
-        g_svg.append('g')
-          .attr('class', 'axis')
-          .call(time_axis);
 
-        // time calculations (todo: use timescale)
-        g_min_date=9999999999999; g_max_date=0;
-        for (i = 0; i < g_events.length; i++) {
-          g_events[i].dateInt = dateToInt(g_events[i].date);
-          g_min_date = Math.min(g_min_date, g_events[i].dateInt);
-          g_max_date = Math.max(g_max_date, g_events[i].dateInt);
-        }
-
-        for (j=0;j<g_people.length;j++) {
-          // a person's default_pos is that person's default position
-          // in the chart
-          g_people[j].default_pos = g_size.z * (j+1) / (g_people.length+1);
-          // todo: use d3.scale.ordinal
-        }
-
+        prepare_events_people();
         calc_events_chart_data();
         calc_people_chart_data();
 
