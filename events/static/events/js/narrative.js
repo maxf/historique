@@ -26,14 +26,17 @@ Narrative = function(anchor, layout) {
     g_startDate, g_endDate,
     g_drag;
 
+    var origz;
 
     g_drag = d3.behavior.drag()
       .on("drag", function(event) {
         var i, person, ct, cz;
-        event.cz = z(d3.event.x, d3.event.y);
-        d3.select(this)
-          .attr('cy', d3.event.y)
-        ;
+        event.cz += d3.event.dy;
+        d3.select(this).attr('cy', this.cy.baseVal.value + d3.event.dy);
+
+        // move the event's title too
+        this.nextSibling.firstChild.setAttribute('transform', label_pos(event));
+
         // recalculate the path of the people who are in that event
         for (i=0; i<event.people.length; i++) {
           person = event.people[i];
@@ -379,43 +382,37 @@ Narrative = function(anchor, layout) {
 
 
   function draw_events() {
-    g_svg
+    var gEnter = g_svg
       .append('g').attr('id', 'events').selectAll('g.event')
         .data(g_events).enter()
-        .append('g').attr('class', 'event')
-        .append('ellipse')
-        .attr('cx', function(event) { return x(event.ct, event.cz); })
-        .attr('cy', function(event) { return y(event.ct, event.cz); })
-        .attr('rx', function(event) { return x(event.rt, event.rz); })
-        .attr('ry', function(event) { return y(event.rt, event.rz); })
-        .attr('id', function(event) { return 'E'+event.id; })
-        .attr('class', 'event')
-        .call(g_drag)
+        .append('g');
+    gEnter
+      .attr('class', 'event')
+      .append('ellipse')
+      .attr('cx', function(event) { return x(event.ct, event.cz); })
+      .attr('cy', function(event) { return y(event.ct, event.cz); })
+      .attr('rx', function(event) { return x(event.rt, event.rz); })
+      .attr('ry', function(event) { return y(event.rt, event.rz); })
+      .attr('id', function(event) { return 'E'+event.id; })
+      .attr('class', 'event-shape')
+      .call(g_drag)
+    ;
+    gEnter
+      .append('a')
+      .attr('xlink:href', function(event) { return g_event_url_prefix+event.id; })
+      .append('text')
+      .attr('transform', label_pos)
+      .attr('text-anchor', 'start')
+      .attr('class', 'event-text')
+      .text( function(event) { return abbreviate(event.title,20); })
     ;
   }
 
-
-  function draw_event_labels() {
-    var event, i, ex, ey, angle;
-    for (i=0;i<g_events.length;i++) {
-      event = g_events[i];
-      if (g_vertical) {
-        angle = 0;
-        ex = event.cz+event.rz;
-        ey = event.ct;
-      } else {
-        angle = -70;
-        ex = event.ct;
-        ey = event.cz-event.rz;
-      }
-      g_svg
-        .append('a')
-        .attr('xlink:href',g_event_url_prefix+event.id)
-        .append('text')
-        .attr('transform', 'translate('+ex+','+ey+') rotate('+angle+')')
-        .attr('text-anchor', 'start')
-        .attr('class', 'event-text')
-        .text(abbreviate(event.title,20));
+  function label_pos(event) {
+    if (g_vertical) {
+      return 'translate('+(event.cz+event.rz)+','+event.ct+')';
+    } else {
+      return 'translate('+event.ct+', '+(event.cz-event.rz)+') rotate(-70)';
     }
   }
 
@@ -497,7 +494,7 @@ Narrative = function(anchor, layout) {
     startYear = g_startDate.getFullYear();
     endYear = g_endDate.getFullYear() + 1;
 
-    var group = g_svg.append('g')
+    group = g_svg.append('g')
       .attr('class', 'axis')
       .call(time_axis);
     for (i=startYear-startYear%5; i<=endYear; i+=5) {
@@ -516,7 +513,6 @@ Narrative = function(anchor, layout) {
     draw_axes();
     draw_people();
     draw_events();
-//    draw_event_labels();
 //    draw_key(30,30,1.3);
   }
 
