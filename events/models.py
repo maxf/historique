@@ -21,9 +21,10 @@ class Event(models.Model):
     description = models.CharField(max_length=2000, blank=True)
     eventType = models.CharField(max_length=50, blank=True)
     date = models.DateTimeField('Event date', blank=True, null=True)
-    photo = models.URLField(blank=True)    
+    photo = models.URLField(blank=True)
     links = models.ManyToManyField(Link, blank=True, null=True)
     people = models.ManyToManyField(Person, blank=True)
+    z = models.DecimalField(max_digits=20, decimal_places=10, null=True, blank=True)
     def __unicode__(self):
         return self.title
     def get_absolute_url(self):
@@ -34,4 +35,3 @@ class Comment(models.Model):
     event = models.ForeignKey(Event)
     def __unicode__(self):
         return self.text
-

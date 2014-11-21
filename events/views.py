@@ -81,3 +81,12 @@ class EventViewSet(viewsets.ModelViewSet):
         event = get_object_or_404(queryset, pk=pk)
         serializer = EventSerializer(event)
         return Response(serializer.data)
+
+    def update_z(self, request, pk=None):
+        if request.POST is not None:
+            event = get_object_or_404(queryset, pk=pk)
+            new_z = request.POST.get('z', None)
+            if new_z is not None:
+                event.z = new_z
+                event.save()
+                return Response(EventSerializer(event))
