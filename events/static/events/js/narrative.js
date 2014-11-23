@@ -50,7 +50,15 @@ Narrative = function(anchor, layout) {
           ;
         }
       })
-      ;
+      .on("dragend", function(event) {
+        d3.json('/events/api/event/'+event.id+'/set/',
+                function(err, rawData){
+                  console.log("got response", err, rawData);
+                })
+          .header("Content-Type","application/x-www-form-urlencoded")
+          .send('POST', 'z='+event.cz);
+
+      });
 
   function x(t,z) { return g_vertical ? z : t; }
   function y(t,z) { return g_vertical ? t : z; }
@@ -371,12 +379,15 @@ Narrative = function(anchor, layout) {
       // adjust event if needed
       // we compute an event's Z by averaging the default_pos of its participants
       sum_default_pos = 0;
-
-      for (j=0; j<event.people.length; j++) {
-        person = event.people[j];
-        sum_default_pos += person.default_pos;
+      if (event.z) {
+        event.cz = parseFloat(event.z);
+      } else {
+        for (j=0; j<event.people.length; j++) {
+          person = event.people[j];
+          sum_default_pos += person.default_pos;
+        }
+        event.cz = sum_default_pos / event.people.length;
       }
-      event.cz = sum_default_pos / event.people.length;
     }
   }
 

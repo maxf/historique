@@ -3,8 +3,11 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework.decorators import detail_route
 from events.models import Event, Comment, Person, Link
 from events.serializers import PersonSerializer, PeopleSerializer, EventSerializer
+from decimal import Decimal
+
 
 def home(request):
     return render(request, 'home/index.html', {'instance_settings': settings.INSTANCE_SETTINGS})
@@ -79,14 +82,14 @@ class EventViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, pk=None):
         queryset = Event.objects.all()
         event = get_object_or_404(queryset, pk=pk)
-        serializer = EventSerializer(event)
-        return Response(serializer.data)
+        return Response(EventSerializer(event).data)
 
-    def update_z(self, request, pk=None):
-        if request.POST is not None:
-            event = get_object_or_404(queryset, pk=pk)
-            new_z = request.POST.get('z', None)
-            if new_z is not None:
-                event.z = new_z
-                event.save()
-                return Response(EventSerializer(event))
+    @detail_route(methods=['post'])
+    def set(self, request, pk=None):
+        queryset = Event.objects.all()
+        event = get_object_or_404(queryset, pk=pk)
+        new_z = request.POST.get('z', None)
+        if new_z is not None:
+            event.z = Decimal(new_z)
+            event.save()
+            return Response(EventSerializer(event).data)
