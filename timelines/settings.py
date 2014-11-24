@@ -30,6 +30,7 @@ TEMPLATE_DEBUG = bool(os.environ.get('TEMPLATE_DEBUG', True))
 
 ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOST','127.0.0.1')]
 
+TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
 # Application definition
 
