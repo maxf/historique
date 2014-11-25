@@ -16,23 +16,17 @@ Narrative = function(anchor, layout) {
 // Only when we draw the shapes do we finally convert to x and y, according to whether the type is
 // horizontal or vertuical
 
-  var g_width, g_height, g_size={};
-
-  var
-    g_vertical = layout === 'vertical',
-    g_person_url_prefix = '/events/person/',
-    g_event_url_prefix = '/events/event/',
-    g_svg,
-    g_events, g_people,
-    g_margin = { start_t: 50, start_z: 20 },
-    g_curvature = 0.3,
-    g_color_scale = d3.scale.category20(),
-    g_people_spacing_in_event = 17,
-    g_min_date, g_max_date,
-    g_timescale, g_zscale,
-    g_startDate, g_endDate,
-    g_anchor = anchor,
-    g_layout = layout;
+  var g_width, g_height;
+  this.g_size={};
+  this.g_vertical = layout === 'vertical';
+  this.g_person_url_prefix = '/events/person/';
+  this.g_event_url_prefix = '/events/event/';
+  this.g_margin = { start_t: 50, start_z: 20 };
+  this.g_curvature = 0.3;
+  this.g_color_scale = d3.scale.category20();
+  this.g_people_spacing_in_event = 17;
+  this.g_anchor = anchor;
+  this.g_layout = layout;
 //    g_drag;
 
     var origz;
@@ -122,6 +116,16 @@ Narrative.prototype.find_person_by_id = function(id) {
     }
   }
   return undefined;
+};
+
+Narrative.prototype.index_person_in_event = function(person, event) {
+  var i;
+  for (i=0; i<event.people.length; i++) {
+    if (event.people[i].id === person.id) {
+      return i;
+    }
+  }
+  return -1;
 };
 
 Narrative.prototype.find_event_by_id = function(id) {
@@ -227,7 +231,7 @@ Narrative.prototype.abbreviate = function(text,max_length) {
 
 // returns y position of idx'th person in event
 Narrative.prototype.event_person_z = function(event, idx) {
-  return (event.cz - event.rz + this.g_people_spacinthis.g_in_event/2) + idx * this.g_people_spacinthis.g_in_event;
+  return (event.cz - event.rz + this.g_people_spacing_in_event/2) + idx * this.g_people_spacing_in_event;
 };
 
 // return index of person in event
@@ -242,7 +246,7 @@ Narrative.prototype.index_of_person_in_event = function(event, person) {
 };
 
 // perform various computations before drawing
-function prepare_events_people() {
+Narrative.prototype.prepare_events_people = function() {
   var i;
   // time calculations (todo: use timescale)
   this.g_min_date=9999999999999; this.g_max_date=0;
@@ -279,7 +283,7 @@ Narrative.prototype.person_path = function(person) {
       } else {
         // the person's first event - write their name
         first_event_t = event.ct;
-        first_event_z = event_person_z(event, idx);
+        first_event_z = this.event_person_z(event, idx);
         // if this is a single person's timeline, remember first event for initial zoom
 //          person.name_pos = {
 //            t: event.ct - 5,
@@ -294,7 +298,7 @@ Narrative.prototype.person_path = function(person) {
 };
 
 
-function calc_people_chart_data() {
+Narrative.prototype.calc_people_chart_data = function() {
   var person, event, person_events, i, j, idx, previdx, thisz, prevz, first_event_t, first_event_z;
   // Trace each person's timeline
   for (i=0; i<this.g_people.length; i++) {
@@ -312,7 +316,7 @@ function calc_people_chart_data() {
 }
 
 
-function draw_people() {
+Narrative.prototype.draw_people = function() {
   var i, j, person, person_group, radius,
     ct, cz, angle, group, person_events, event;
   this.g_svg.select('#people').remove();
@@ -379,7 +383,7 @@ function draw_people() {
 //        .text(person.name)
 //      ;
 //    }
-  }
+  };
 
 Narrative.prototype.calc_events_chart_data = function() {
   var event, i, j, sum_default_pos, event_date_range, person;
@@ -472,7 +476,7 @@ Narrative.prototype.draw_key = function(boxx, boxy, size) {
       .text(this.g_people[i].name)
     ;
   }
-}
+};
 
 Narrative.prototype.pan_to = function(x,y) {
   if (this.g_vertical) {
@@ -507,11 +511,11 @@ Narrative.prototype.draw_axes = function() {
       .attr('y', this.y(year_t, 25))
       .text(i);
   }
-}
+};
 
 Narrative.prototype.draw_everything = function() {
-  draw_axes();
-  draw_people();
+  this.draw_axes();
+  this.draw_people();
   this.draw_events();
 //    draw_key(30,30,1.3);
 }
@@ -528,6 +532,7 @@ Narrative.prototype.draw_everything = function() {
 
 
 Narrative.prototype.draw_chart = function(person_id) {
+  console.log('draw_chart');
   var that = this;
   d3.json('/events/api/event/', function(e) {
     d3.json('/events/api/person/', function(p) {
@@ -593,9 +598,9 @@ Narrative.prototype.draw_chart = function(person_id) {
       ;
 
       if (that.g_vertical) {
-        pan_to(0,-20);
+        that.pan_to(0,-20);
       } else {
-        pan_to(-20,0);
+        that.pan_to(-20,0);
       }
 
       // time scale
@@ -617,7 +622,7 @@ Narrative.prototype.draw_chart = function(person_id) {
         .attr('height',200000);
 
 
-      prepare_events_people();
+      that.prepare_events_people();
       that.calc_events_chart_data();
       that.calc_people_chart_data();
 
@@ -628,6 +633,7 @@ Narrative.prototype.draw_chart = function(person_id) {
 
 
 Narrative.prototype.draw_events = function() {
+  var that=this;
   var gEnter = this.g_svg
     .append('g').attr('id', 'events').selectAll('g.event')
     .data(this.g_events).enter()
@@ -635,13 +641,12 @@ Narrative.prototype.draw_events = function() {
     gEnter
       .attr('class', 'event')
       .append('ellipse')
-      .attr('cx', function(event) { return this.x(event.ct, event.cz); })
-      .attr('cy', function(event) { return this.y(event.ct, event.cz); })
-      .attr('rx', function(event) { return this.x(event.rt, event.rz); })
-      .attr('ry', function(event) { return this.y(event.rt, event.rz); })
+      .attr('cx', function(event) { return that.x(event.ct, event.cz); })
+      .attr('cy', function(event) { return that.y(event.ct, event.cz); })
+      .attr('rx', function(event) { return that.x(event.rt, event.rz); })
+      .attr('ry', function(event) { return that.y(event.rt, event.rz); })
       .attr('id', function(event) { return 'E'+event.id; })
-      .attr('class', 'event-shape')
-//      .call(this.g_drag)
+      .attr('class', 'event-shape');
     ;
     gEnter
       .append('a')
@@ -650,6 +655,6 @@ Narrative.prototype.draw_events = function() {
       .attr('transform', this.label_pos)
       .attr('text-anchor', 'start')
       .attr('class', 'event-text')
-      .text( function(event) { return this.abbreviate(event.title,20); })
+      .text( function(event) { return that.abbreviate(event.title,20); })
     ;
-  };
+};
