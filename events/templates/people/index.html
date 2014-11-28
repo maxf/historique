@@ -1,13 +1,13 @@
 <html>
   <head>
     {% include 'common/head.html' %}
-    <title>{{ settings.people }}</title>
+    <title>{{ settings.string_people }}</title>
   </head>
   <body>
     {% include 'common/header.html' %}
 
     <div class="container theme-showcase" role="main">
-      <h1>{{ settings.people }}</h1>
+      <h1>{{ settings.string_people }}</h1>
 
       {% include "people/template_list.html" %}
 

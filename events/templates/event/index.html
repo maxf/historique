@@ -24,12 +24,12 @@
 
       {% include "common/links_helper.html" %}
 
-      <h2>{{ settings.people }}</h2>
+      <h2>{{ settings.string_people }}</h2>
 
       {% include "people/template_list.html" %}
 
       {% if settings.SETTINGS.features_enabled.comments %}
-      <h2>{{ settings.comments }}</h2>
+      <h2>{{ settings.string_comments }}</h2>
 
       {% if comments %}
         <ul>
@@ -38,14 +38,14 @@
         {% endfor %}
         </ul>
       {% else %}
-        <p>{{ settings.no_comments }}</p>
+        <p>{{ settings.string_no_comments }}</p>
       {% endif %}
 
-      <h2>{{ settings.add_comment }}</h2>
+      <h2>{{ settings.string_add_comment }}</h2>
       <form action="{% url 'events:send_comment' event.id %}" method="post">
         {% csrf_token %}
         <textarea name="comment_text" rows="10" cols="50"></textarea>
-        <input type="submit" value="{{ settings.send }}" />
+        <input type="submit" value="{{ settings.string_send }}" />
       </form>
       {% endif %}
     </div>
