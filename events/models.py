@@ -1,5 +1,18 @@
 from django.db import models;
 
+class Settings(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.CharField(max_length=2000)
+    string_people = models.CharField(max_length=50)
+    string_events = models.CharField(max_length=50)
+    string_no_events = models.CharField(max_length=50)
+    string_links = models.CharField(max_length=50)
+    string_comments = models.CharField(max_length=50)
+    string_no_comments = models.CharField(max_length=50)
+    string_add_comment = models.CharField(max_length=50)
+    string_send = models.CharField(max_length=50)
+
+
 class Link(models.Model):
     title = models.CharField(max_length=200, blank=True)
     url = models.URLField()

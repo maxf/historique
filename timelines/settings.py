@@ -106,17 +106,6 @@ USE_L10N = True
 USE_TZ = False
 
 INSTANCE_SETTINGS =  {
-    "title": "Famille Froumentin",
-    "description": "Historique des Froumentin",
-    "people": "Personnes",
-    "events": "Événement",
-    "no_events": "Pas d'événement",
-    "no_people": "Personne",
-    "links": "Liens",
-    "comments": "Commentaires",
-    "no_comments": "Pas de commentaires",
-    "add_comment": "Ajouter un commentaire",
-    "send": "Envoyer",
 
     "features_enabled": {
         "comments": True

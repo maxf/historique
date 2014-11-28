@@ -7,12 +7,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="{% url 'events:home' %}">{{ instance_settings.title }}</a>
+      <a class="navbar-brand" href="{% url 'events:home' %}">{{ settings.title }}</a>
     </div>
     <div class="collapse navbar-collapse">
       <ul class="nav navbar-nav">
-        <li><a href="{% url 'events:events' %}">{{ instance_settings.events }}</a></li>
-        <li><a href="{% url 'events:people' %}">{{ instance_settings.people }}</a></l>
+        <li><a href="{% url 'events:events' %}">{{ settings.events }}</a></li>
+        <li><a href="{% url 'events:people' %}">{{ settings.people }}</a></l>
         <li><a href="/admin/events/">Edit</a></l>
         <li><a href="{% url 'events:about' %}">About</a></l>
       </ul>

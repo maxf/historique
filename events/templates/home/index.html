@@ -3,7 +3,7 @@
 <html>
   <head>
     {% include 'common/head.html' %}
-    <title>{{ instance_settings.title }}</title>
+    <title>{{ settings.title }}</title>
     <link rel="stylesheet" href="{% static 'events/css/graph.css' %}"/>
   </head>
   <body role="document">
@@ -11,9 +11,9 @@
 
     <div class="container theme-showcase" role="main">
 
-        <h1>{{ instance_settings.title }}</h1>
-        <p>{{ instance_settings.description }}</p>
-        <p>Drag/slide to pan, scroll/pinch to zoom, click/tap on objects or lines for details</p>
+        <h1>{{ settings.title }}</h1>
+        <p>{{ settings.description }}</p>
+
         <div id="chart"></div>
         <div id="chart2"></div>
     </div>

@@ -4,25 +4,25 @@ from django.conf import settings
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
-from events.models import Event, Comment, Person, Link
+from events.models import Event, Comment, Person, Link, Settings
 from events.serializers import PersonSerializer, PeopleSerializer, EventSerializer
 from decimal import Decimal
 
 
 def home(request):
-    return render(request, 'home/index.html', {'instance_settings': settings.INSTANCE_SETTINGS})
+    return render(request, 'home/index.html', {'settings': Settings.objects.all()[0]})
 
 def about(request):
-    return render(request, 'about/index.html', {'instance_settings': settings.INSTANCE_SETTINGS})
+    return render(request, 'about/index.html', {'settings': Settings.objects.all()[0]})
 
 
 def events(request):
     events = Event.objects.order_by('date')
-    return render(request, 'events/index.html', {'events':events, 'instance_settings': settings.INSTANCE_SETTINGS})
+    return render(request, 'events/index.html', {'events':events, 'settings': Settings.objects.all()[0]})
 
 def people(request):
     people = Person.objects.order_by('name')
-    return render(request, 'people/index.html', {'people':people, 'instance_settings': settings.INSTANCE_SETTINGS})
+    return render(request, 'people/index.html', {'people':people, 'settings': Settings.objects.all()[0]})
 
 def event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
@@ -31,7 +31,7 @@ def event(request, event_id):
         'comments':Comment.objects.filter(event_id=event_id),
         'links': event.links.all(),
         'people': event.people.all(),
-        'instance_settings': settings.INSTANCE_SETTINGS
+        'settings': Settings.objects.all()[0]
     }
     return render(request, 'event/index.html', context)
 
@@ -50,7 +50,7 @@ def person(request, person_id):
     person = get_object_or_404(Person, id=person_id)
     links = person.links.all()
     events = Event.objects.filter(people=person)
-    context = {'person': person, 'links': links, 'events': events, 'instance_settings': settings.INSTANCE_SETTINGS}
+    context = {'person': person, 'links': links, 'events': events, 'settings': Settings.objects.all()[0]}
     return render(request, 'person/index.html', context)
 
 

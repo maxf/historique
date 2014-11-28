@@ -12,19 +12,19 @@
     <div class="container theme-showcase" role="main">
 
       <h1>
-        {{ person.name }} 
+        {{ person.name }}
       </h1>
 
       {% if person.photo %} <img src="{{ person.photo }}" alt="photo"/> {% endif %}
-      
+
       <p id="chart">
 
       {% include "common/links_helper.html" %}
-  
-      <h2>{{ instance_settings.events }}</h2>
-  
+
+      <h2>{{ settings.events }}</h2>
+
       {% include "events/template_list.html" %}
-    </div>  
+    </div>
 
     <script src="{% static 'events/js/d3.v3.min.js' %}"></script>
     <script src="{% static 'events/js/narrative.js' %}"></script>

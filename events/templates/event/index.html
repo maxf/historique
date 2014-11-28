@@ -1,7 +1,7 @@
 <html>
   <head>
     {% include 'common/head.html' %}
-    <title>{{ instance_settings.title }}</title>
+    <title>{{ settings.title }}</title>
   </head>
   <body>
     {% include 'common/header.html' %}
@@ -14,23 +14,23 @@
       </div>
 
       {% if event.photo %} <img src="{{ event.photo }}" alt="photo" height="300"/> {% endif %}
-      
-    
+
+
       {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-    
+
       <h2>{{ event.eventType }}, {{ event.date }}</h2>
 
       <div>{{ event.description }}</div>
 
       {% include "common/links_helper.html" %}
-      
-      <h2>{{ instance_settings.people }}</h2>
-    
+
+      <h2>{{ settings.people }}</h2>
+
       {% include "people/template_list.html" %}
 
-      {% if settings.INSTANCE_SETTINGS.features_enabled.comments %}
-      <h2>{{ instance_settings.comments }}</h2>
-    
+      {% if settings.SETTINGS.features_enabled.comments %}
+      <h2>{{ settings.comments }}</h2>
+
       {% if comments %}
         <ul>
         {% for comment in comments %}
@@ -38,14 +38,14 @@
         {% endfor %}
         </ul>
       {% else %}
-        <p>{{ instance_settings.no_comments }}</p>
+        <p>{{ settings.no_comments }}</p>
       {% endif %}
-    
-      <h2>{{ instance_settings.add_comment }}</h2>
+
+      <h2>{{ settings.add_comment }}</h2>
       <form action="{% url 'events:send_comment' event.id %}" method="post">
         {% csrf_token %}
         <textarea name="comment_text" rows="10" cols="50"></textarea>
-        <input type="submit" value="{{ instance_settings.send }}" />
+        <input type="submit" value="{{ settings.send }}" />
       </form>
       {% endif %}
     </div>

@@ -1,19 +1,18 @@
 <html>
   <head>
     {% include 'common/head.html' %}
-    <title>{{ instance_settings.events }}</title>
+    <title>{{ settings.events }}</title>
   </head>
   <body role="document">
     {% include 'common/header.html' %}
 
     <div class="container theme-showcase" role="main">
 
-      <h1>{{ instance_settings.events }}</h1>
+      <h1>{{ settings.events }}</h1>
 
       {% include "events/template_list.html" %}
-  
+
       {% include 'common/scripts.html' %}
     </div>
   </body>
 </html>
-
