@@ -33,7 +33,7 @@ class Event(models.Model):
     title = models.CharField(max_length=200)
     description = models.CharField(max_length=2000, blank=True)
     eventType = models.CharField(max_length=50, blank=True)
-    date = models.DateTimeField('Event date', blank=True, null=True)
+    date = models.DateField('Event date', blank=True, null=True)
     photo = models.URLField(blank=True)
     links = models.ManyToManyField(Link, blank=True, null=True)
     people = models.ManyToManyField(Person, blank=True)
