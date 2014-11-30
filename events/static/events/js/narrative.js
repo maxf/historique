@@ -493,7 +493,7 @@ Narrative.prototype.draw_axes = function() {
     .scale(this.g_timescale)
     .orient(this.g_vertical?'right':'bottom')
     .tickFormat(d3.time.format(''))
-    .ticks(d3.time.year, 1)
+    .ticks(d3.time.year, 20)
   ;
   startYear = this.g_startDate.getFullYear();
   endYear = this.g_endDate.getFullYear() + 1;
@@ -501,7 +501,7 @@ Narrative.prototype.draw_axes = function() {
   group = this.g_svg.append('g')
     .attr('class', 'axis')
     .call(time_axis);
-  for (i=startYear-startYear%5; i<=endYear; i+=5) {
+  for (i=startYear-startYear%5; i<=endYear; i+=20) {
     year_t = this.g_timescale(new Date(i,6));
     group
       .append('g')
@@ -532,7 +532,6 @@ Narrative.prototype.draw_everything = function() {
 
 
 Narrative.prototype.draw_chart = function(person_id) {
-  console.log('draw_chart');
   var that = this;
   d3.json('/events/api/event/', function(e) {
     d3.json('/events/api/person/', function(p) {
@@ -573,13 +572,13 @@ Narrative.prototype.draw_chart = function(person_id) {
 
       if (that.g_vertical) {
         that.g_width = 500;
-        that.g_height = 3000;
+        that.g_height = 6000;
         that.g_size.t = that.g_height;
         that.g_size.z = that.g_width;
         canvas_width = that.g_size.z + 2*that.g_margin.start_z;
         canvas_height = that.g_size.t + 2*that.g_margin.start_t;
       } else {
-        that.g_width = 3000;
+        that.g_width = 6000;
         that.g_height = 500;
         that.g_size.t = that.g_width;
         that.g_size.z = that.g_height;
