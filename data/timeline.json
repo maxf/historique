@@ -1,0 +1,19 @@
+{
+    "people": [
+        {"name":"William The Conqueror"},
+        {"name":"Mathilda of Flanders"},
+        {"name":"William II"}
+    ],
+    "events": [
+        {
+            "title": "B. William The Conqueror",
+            "year": 1128,
+            "participants": [0]
+        },
+        {
+            "title": "D. William The Conqueror",
+            "year": 1087, "month": 9, "day": 9,
+            "participants": [0]
+        }
+    ]
+}
