@@ -1,19 +1,27 @@
 {
-    "people": [
-        {"name":"William The Conqueror"},
-        {"name":"Mathilda of Flanders"},
-        {"name":"William II"}
-    ],
     "events": [
-        {
-            "title": "B. William The Conqueror",
-            "year": 1128,
-            "participants": [0]
-        },
-        {
-            "title": "D. William The Conqueror",
-            "year": 1087, "month": 9, "day": 9,
-            "participants": [0]
-        }
-    ]
+        {"participants": [13], "title": "D. William The Conqueror", "year":1087, "month":9, "day":9},
+        {"participants": [13], "title": "B. William The Conqueror", "year":1028},
+        {"participants": [13, 25, 26], "title": "B. William II", "year":1056},
+        {"participants": [27], "title": "D. Henry I", "year":1135, "month":12, "day":1},
+        {"participants": [28], "title": "D. Adela of Normandy", "year":1137, "month":3, "day":8},
+        {"participants": [29], "title": "B. Stephen II", "year":1045},
+        {"participants": [], "title": "D. Stephen II", "year":1102, "month":5, "day":10},
+        {"participants": [13, 25, 28], "title": "B. Adela of Normandy", "year":1067},
+        {"participants": [13, 25, 27], "title": "B. Henry I", "year":1068},
+        {"participants": [26], "title": "D. William II", "year":1100, "month":8, "day":2},
+        {"participants": [30], "title": "D. Stephen", "year":1154, "month":10, "day":25},
+        {"participants": [25], "title": "B. Mathilda of Flanders", "year":1031},
+        {"participants": [28, 29, 30], "title": "B. Stephen", "year":1094},
+        {"participants": [13, 25], "title": "D. Mathilda of Flanders", "year":1083, "month":11, "day":2}
+    ],
+    "people": {
+        "13": "William The Conqueror",
+        "25": "Mathilda of Flanders",
+        "26": "William II",
+        "27": "Henry I",
+        "28": "Adela of Normandy",
+        "29": "Stephen II, Compte de Blois",
+        "30": "Stephen"
+    }
 }
