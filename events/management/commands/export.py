@@ -30,4 +30,4 @@ class Command(BaseCommand):
                 event_obj['participants'].append(person.id)
             export_obj['events'].append(event_obj)
 
-        self.stdout.write(json.dumps(export_obj, sort_keys=True, indent=4))
+        self.stdout.write(json.dumps(export_obj, sort_keys=True, indent=4, separators=(',', ': ')))
