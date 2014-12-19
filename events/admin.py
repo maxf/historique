@@ -3,7 +3,7 @@ from events.models import Settings, Event, Comment, Person, Link
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('title','date')
+    list_display = ('title','year','month','day')
 
 admin.site.register(Settings)
 admin.site.register(Event, EventAdmin)
