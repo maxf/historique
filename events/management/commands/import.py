@@ -1,3 +1,4 @@
+import sys
 import json
 from django.core.management.base import BaseCommand, CommandError
 from events.models import Event, Person
@@ -11,10 +12,10 @@ class Command(BaseCommand):
         Event.objects.all().delete()
         Person.objects.all().delete()
 
-        import_obj = json.loads(self.stdin.read())
+        import_obj = json.loads(sys.stdin.read())
 
-        for person_obj in import_obj['people']:
-            Person.objects.create(name=person_obj['name'])
+        for person in import_obj['people']:
+            Person.objects.create(name=import_obj['people'][person])
 
         for event_obj in import_obj['events']:
             event = Event(title=event_obj['title'])
@@ -25,7 +26,8 @@ class Command(BaseCommand):
             if hasattr(event_obj, 'day'):
                 event['day'] = event_obj['day']
             event.save()
-            participant_pks = []
+            participants = []
             for participant in event_obj['participants']:
-                participant_pks.append(Person.objects.filter(name=participant['name'])[0]['pk'])
-            event.participants.add(*participants_pks)
+                name = import_obj['people'][str(participant)]
+                participants.append(Person.objects.filter(name=name)[0])
+            event.people.add(*participants)

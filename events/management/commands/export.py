@@ -12,13 +12,22 @@ class Command(BaseCommand):
 
         people = Person.objects.all()
         for person in people:
-            export_obj['people'][person.id] = person.name
+            export_obj['people'][person.id] = {
+                'name': person.name,
+                'photo': person.photo,
+                }
 
         events = Event.objects.all()
-        for event in events:
-            event_obj = { 'title':event.title, 'z':event.z, 'participants':[] }
+        for event in events.order_by('year','month','day'):
+            event_obj = { 'title':event.title,
+                          'description':event.description,
+                          'type':event.eventType,
+                          'year':event.year, 'month':event.month, 'day':event.day,
+                          'photo':event.photo,
+                          'z':event.z,
+                          'participants':[] }
             for person in event.people.all():
                 event_obj['participants'].append(person.id)
             export_obj['events'].append(event_obj)
 
-        self.stdout.write(json.dumps(export_obj))
+        self.stdout.write(json.dumps(export_obj, sort_keys=True, indent=4))
