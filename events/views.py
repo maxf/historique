@@ -17,7 +17,7 @@ def about(request):
 
 
 def events(request):
-    events = Event.objects.order_by('date')
+    events = Event.objects.order_by('year', 'month', 'day')
     return render(request, 'events/index.html', {'events':events, 'settings': Settings.objects.all()[0]})
 
 def people(request):
