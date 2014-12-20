@@ -5,7 +5,10 @@
             "description": "",
             "month": 9,
             "participants": [
-                172
+                172,
+                176,
+                175,
+                173
             ],
             "photo": "",
             "title": "D. William The Conqueror",
@@ -38,33 +41,33 @@
             "photo": "",
             "title": "B. William II",
             "type": "",
-            "year": null,
+            "year": 1056,
             "z": null
         },
         {
-            "day": null,
+            "day": 1,
             "description": "",
-            "month": null,
+            "month": 12,
             "participants": [
                 173
             ],
             "photo": "",
             "title": "D. Henry I",
             "type": "",
-            "year": null,
+            "year": 1135,
             "z": null
         },
         {
-            "day": null,
+            "day": 8,
             "description": "",
-            "month": null,
+            "month": 3,
             "participants": [
                 175
             ],
             "photo": "",
             "title": "D. Adela of Normandy",
             "type": "",
-            "year": null,
+            "year": 1137,
             "z": null
         },
         {
@@ -77,18 +80,18 @@
             "photo": "",
             "title": "B. Stephen II",
             "type": "",
-            "year": null,
+            "year": 1045,
             "z": null
         },
         {
-            "day": null,
+            "day": 19,
             "description": "",
-            "month": null,
-            "participants": [],
+            "month": 5,
+            "participants": [177],
             "photo": "",
             "title": "D. Stephen II",
             "type": "",
-            "year": null,
+            "year": 1102,
             "z": null
         },
         {
@@ -103,7 +106,7 @@
             "photo": "",
             "title": "B. Adela of Normandy",
             "type": "",
-            "year": null,
+            "year": 1067,
             "z": null
         },
         {
@@ -118,33 +121,33 @@
             "photo": "",
             "title": "B. Henry I",
             "type": "",
-            "year": null,
+            "year": 1068,
             "z": null
         },
         {
-            "day": null,
+            "day": 2,
             "description": "",
-            "month": null,
+            "month": 8,
             "participants": [
                 176
             ],
             "photo": "",
             "title": "D. William II",
             "type": "",
-            "year": null,
+            "year": 1100,
             "z": null
         },
         {
-            "day": null,
+            "day": 25,
             "description": "",
-            "month": null,
+            "month": 10,
             "participants": [
                 174
             ],
             "photo": "",
             "title": "D. Stephen",
             "type": "",
-            "year": null,
+            "year": 1154,
             "z": null
         },
         {
@@ -157,7 +160,7 @@
             "photo": "",
             "title": "B. Mathilda of Flanders",
             "type": "",
-            "year": null,
+            "year": 1031,
             "z": null
         },
         {
@@ -172,21 +175,24 @@
             "photo": "",
             "title": "B. Stephen",
             "type": "",
-            "year": null,
+            "year": 1094,
             "z": null
         },
         {
-            "day": null,
+            "day": 2,
             "description": "",
-            "month": null,
+            "month": 11,
             "participants": [
                 171,
-                172
+                172,
+                176,
+                175,
+                173
             ],
             "photo": "",
             "title": "D. Mathilda of Flanders",
             "type": "",
-            "year": null,
+            "year": 1083,
             "z": null
         }
     ],
