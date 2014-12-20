@@ -518,7 +518,7 @@ Narrative.prototype.draw_everything = function() {
   this.draw_people();
   this.draw_events();
 //    draw_key(30,30,1.3);
-}
+};
 
 
 
@@ -534,8 +534,17 @@ Narrative.prototype.draw_everything = function() {
 Narrative.prototype.draw_chart = function(person_id) {
   var that = this;
   d3.json('/events/api/event/', function(e) {
+    var i;
+    for (i=0; i<e.length; i++) {
+      e[i].date = new Date(
+        e[i].year,
+        e[i].month ? e[i].month-1 : 6,
+        e[i].day || 1
+      );
+    }
+
     d3.json('/events/api/person/', function(p) {
-      var i, j, timeSpan, canvas_width, canvas_height;
+      var j, timeSpan, canvas_width, canvas_height;
 
       // sort events by data
       that.g_events = e.sort(function(e1,e2) {
@@ -603,8 +612,8 @@ Narrative.prototype.draw_chart = function(person_id) {
       }
 
       // time scale
-      that.g_startDate = new Date(that.g_events[0].date);
-      that.g_endDate = new Date(that.g_events[that.g_events.length-1].date);
+      that.g_startDate = that.g_events[0].date;
+      that.g_endDate = that.g_events[that.g_events.length-1].date;
       timeSpan = that.g_endDate-that.g_startDate; // milliseconds
       that.g_timescale = d3.time.scale()
         .domain([that.g_startDate, that.g_endDate])
