@@ -98,15 +98,6 @@ Narrative.prototype.get_path = function(t0, z0, t1, z1) {
          '  ' + this.x(t1, z1) + ',' + this.y(t1, z1);
 };
 
-Narrative.prototype.index_of_person_in_event = function(person, event) {
-  var i;
-  for (i=0; i<event.people.length; i++) {
-    if (event.people[i].id === person.id) {
-      return i;
-    }
-  }
-  return -1;
-};
 
 Narrative.prototype.find_person_by_id = function(id) {
   var i;
@@ -232,17 +223,6 @@ Narrative.prototype.abbreviate = function(text,max_length) {
 // returns y position of idx'th person in event
 Narrative.prototype.event_person_z = function(event, idx) {
   return (event.cz - event.rz + this.g_people_spacing_in_event/2) + idx * this.g_people_spacing_in_event;
-};
-
-// return index of person in event
-Narrative.prototype.index_of_person_in_event = function(event, person) {
-  var i;
-  for (i=0; i<event.people.length; i++) {
-    if (event.people[i] === person) {
-      return i;
-    }
-  }
-  return -1;
 };
 
 // perform various computations before drawing
