@@ -15,7 +15,6 @@ def home(request):
 def about(request):
     return render(request, 'about/index.html', {'settings': Settings.objects.all()[0]})
 
-
 def events(request):
     events = Event.objects.order_by('year', 'month', 'day')
     return render(request, 'events/index.html', {'events':events, 'settings': Settings.objects.all()[0]})
@@ -30,7 +29,7 @@ def event(request, event_id):
         'event': event,
         'comments':Comment.objects.filter(event_id=event_id),
         'links': event.links.all(),
-        'people': event.people.all(),
+        'participants': event.participants.all(),
         'settings': Settings.objects.all()[0]
     }
     return render(request, 'event/index.html', context)
@@ -49,7 +48,7 @@ def delete_comment(request, event_id, comment_id):
 def person(request, person_id):
     person = get_object_or_404(Person, id=person_id)
     links = person.links.all()
-    events = Event.objects.filter(people=person)
+    events = person.events()
     context = {'person': person, 'links': links, 'events': events, 'settings': Settings.objects.all()[0]}
     return render(request, 'person/index.html', context)
 

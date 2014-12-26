@@ -41,8 +41,8 @@ Narrative = function(anchor, layout) {
 //        this.nextSibling.firstChild.setAttribute('transform', label_pos(event));
 //
 //        // recalculate the path of the people who are in that event
-//        for (i=0; i<event.people.length; i++) {
-//          person = event.people[i];
+//        for (i=0; i<event.participants.length; i++) {
+//          person = event.participants[i];
 //          d3.select('#P'+person.id).attr('d', person_path(person));
 //          // relocate the perosn's disc with id disc-[person.id]-[event.id]
 //          ct = event.ct;
@@ -111,8 +111,8 @@ Narrative.prototype.find_person_by_id = function(id) {
 
 Narrative.prototype.index_person_in_event = function(person, event) {
   var i;
-  for (i=0; i<event.people.length; i++) {
-    if (event.people[i].id === person.id) {
+  for (i=0; i<event.participants.length; i++) {
+    if (event.participants[i].id === person.id) {
       return i;
     }
   }
@@ -247,7 +247,7 @@ Narrative.prototype.prepare_events_people = function() {
 Narrative.prototype.person_path = function(person) {
   var previous_event = null;
   var path = '';
-  var person_events = this.g_events.filter(function(event) { return event.people.indexOf(person) !== -1; });
+  var person_events = this.g_events.filter(function(event) { return event.participants.indexOf(person) !== -1; });
   var event;
   var i, idx, prevz, thisz, previdx, first_event_t, first_event_z;
 
@@ -288,7 +288,7 @@ Narrative.prototype.calc_people_chart_data = function() {
     person_events = [];
     for (j=0; j<this.g_events.length; j++) {
       event = this.g_events[j];
-      if (event.people.indexOf(person) !== -1) {
+      if (event.participants.indexOf(person) !== -1) {
         person_events.push(event);
       }
     }
@@ -320,7 +320,7 @@ Narrative.prototype.draw_people = function() {
 
       radius = Math.sqrt(4*this.g_people_spacing_in_event);
 
-      person_events = this.g_events.filter(function(event) { return event.people.indexOf(person) !== -1; });
+      person_events = this.g_events.filter(function(event) { return event.participants.indexOf(person) !== -1; });
       for (j=0; j<person_events.length; j++) {
         event = person_events[j];
         ct = event.ct;
@@ -373,7 +373,7 @@ Narrative.prototype.calc_events_chart_data = function() {
   for (i=0;i<this.g_events.length;i++) {
     event = this.g_events[i];
     event.ct = this.g_timescale(event.dateInt);
-    event.rz = this.g_people_spacing_in_event*event.people.length/2;
+    event.rz = this.g_people_spacing_in_event*event.participants.length/2;
     event.rt = this.g_people_spacing_in_event/2;
     // adjust event if needed
     // we compute an event's Z by averaging the default_pos of its participants
@@ -381,11 +381,11 @@ Narrative.prototype.calc_events_chart_data = function() {
     if (event.z) {
       event.cz = parseFloat(event.z);
     } else {
-      for (j=0; j<event.people.length; j++) {
-        person = event.people[j];
+      for (j=0; j<event.participants.length; j++) {
+        person = event.participants[j];
         sum_default_pos += person.default_pos;
       }
-      event.cz = sum_default_pos / event.people.length;
+      event.cz = sum_default_pos / event.participants.length;
     }
   }
 }
@@ -526,14 +526,14 @@ Narrative.prototype.draw_chart = function(person_id) {
     d3.json('/events/api/person/', function(p) {
       var j, timeSpan, canvas_width, canvas_height;
 
-      // sort events by data
+      // sort events by date
       that.g_events = e.sort(function(e1,e2) {
         return new Date(e1.date) - new Date(e2.date);
       });
 
       // remove events with no participants
       that.g_events = that.g_events.filter(function(e) {
-        return e.people.length > 0;
+        return e.participants.length > 0;
       });
 
       // remove people with no events
@@ -541,20 +541,20 @@ Narrative.prototype.draw_chart = function(person_id) {
         return person.event_set.length>0;
       });
 
-      // sort people by number of events (so the most important people are
-      // visible from the start
-      that.g_people.sort(function(a,b) {
-        return b.event_set.length - a.event_set.length;
-      });
+//      // sort people by number of events (so the most important people are
+//      // visible from the start
+//      that.g_people.sort(function(a,b) {
+//        return b.event_set.length - a.event_set.length;
+//      });
 
       // populate the event objects with people
       for (i=0; i<that.g_events.length; i++) {
-        for (j=0; j<that.g_events[i].people.length; j++) {
-          that.g_events[i].people[j] = that.find_person_by_id(that.g_events[i].people[j].id);
+        for (j=0; j<that.g_events[i].participants.length; j++) {
+          that.g_events[i].participants[j] = that.find_person_by_id(that.g_events[i].participants[j].id);
         }
-        that.g_events[i].people.sort(function(a,b) {
-          return b.event_set.length - a.event_set.length;
-        });
+//        that.g_events[i].participants.sort(function(a,b) {
+//          return b.event_set.length - a.event_set.length;
+//        });
       }
 
       // create svg for the chart

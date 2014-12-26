@@ -4,9 +4,11 @@ class Settings(models.Model):
     title = models.CharField(max_length=200)
     description = models.CharField(max_length=2000)
     string_people = models.CharField(max_length=50)
+    string_no_people = models.CharField(max_length=50)
     string_events = models.CharField(max_length=50)
     string_no_events = models.CharField(max_length=50)
     string_links = models.CharField(max_length=50)
+    string_no_links = models.CharField(max_length=50)
     string_comments = models.CharField(max_length=50)
     string_no_comments = models.CharField(max_length=50)
     string_add_comment = models.CharField(max_length=50)
@@ -28,6 +30,9 @@ class Person(models.Model):
         return self.name
     def get_absolute_url(self):
         return "/events/person/%i/" % self.id
+    def events(self):
+        return [ep.event for ep in EventPerson.objects.filter(participant=self)]
+
 
 class Event(models.Model):
     title = models.CharField(max_length=200)
@@ -38,12 +43,19 @@ class Event(models.Model):
     day = models.PositiveSmallIntegerField(blank=True, null=True)
     photo = models.URLField(blank=True)
     links = models.ManyToManyField(Link, blank=True, null=True)
-    people = models.ManyToManyField(Person, blank=True)
+    participants = models.ManyToManyField(Person, through='EventPerson')
     z = models.DecimalField(max_digits=20, decimal_places=10, null=True, blank=True)
     def __unicode__(self):
         return self.title
     def get_absolute_url(self):
         return "/events/event/%i/" % self.id
+
+
+class EventPerson(models.Model):
+    number = models.PositiveSmallIntegerField(blank=True, null=True)
+    event = models.ForeignKey(Event)
+    participant = models.ForeignKey(Person)
+
 
 class Comment(models.Model):
     text = models.CharField(max_length=2000)

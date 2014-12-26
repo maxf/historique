@@ -1,4 +1,18 @@
 {
+    "settings": {
+        "title": "Kings and Queens of England",
+        "description": "timeline of the English royals",
+        "string_people": "people",
+        "string_no_people": "no people",
+        "string_events": "events",
+        "string_no_events": "no events",
+        "string_links": "links",
+        "string_no_links": "no links",
+        "string_comments": "comments",
+        "string_no_comments": "no comments",
+        "string_add_comment": "add comment",
+        "string_send": "send"
+    },
     "events": [
         {
             "day": 9,
@@ -34,8 +48,8 @@
             "description": "",
             "month": null,
             "participants": [
-                176,
                 171,
+                176,
                 172
             ],
             "photo": "",
@@ -99,9 +113,9 @@
             "description": "",
             "month": null,
             "participants": [
-                171,
+                175,
                 172,
-                175
+                171                
             ],
             "photo": "",
             "title": "B. Adela of Normandy",
@@ -158,7 +172,7 @@
                 171
             ],
             "photo": "",
-            "title": "B. Mathilda of Flanders",
+            "title": "B. Matilda of Flanders",
             "type": "",
             "year": 1031,
             "z": null
@@ -190,15 +204,42 @@
                 173
             ],
             "photo": "",
-            "title": "D. Mathilda of Flanders",
+            "title": "D. Matilda of Flanders",
             "type": "",
             "year": 1083,
+            "z": null
+        },
+        {
+            "day": 7,
+            "description": "",
+            "month": 2,
+            "participants": [
+                178,
+                173
+            ],
+            "photo": "",
+            "title": "B. Empress Matilda",
+            "type": "",
+            "year": 1102,
+            "z": null
+        },
+        {
+            "day": 10,
+            "description": "",
+            "month": 9,
+            "participants": [
+                178
+            ],
+            "photo": "",
+            "title": "D. Empress Matilda",
+            "type": "",
+            "year": 1167,
             "z": null
         }
     ],
     "people": {
         "171": {
-            "name": "Mathilda of Flanders",
+            "name": "Matilda of Flanders",
             "photo": ""
         },
         "172": {
@@ -224,6 +265,10 @@
         "177": {
             "name": "Stephen II, Compte de Blois",
             "photo": ""
+        },
+        "178": {
+            "name": "Empress Matilda",
+            "photo": "https://en.wikipedia.org/wiki/File:Empress_Mathilda.png"
         }
     }
 }

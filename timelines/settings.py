@@ -69,7 +69,7 @@ if IS_HEROKU:
     }
 else:
     DATABASES = {
-        'default': dj_database_url.parse(os.environ.get('PGURL','postgres://timelines:timelines@localhost/timelines'))
+        'default': dj_database_url.parse(os.environ.get('PGURL','postgres://mf@localhost/timelines_royals'))
     }
 
 

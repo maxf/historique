@@ -29,8 +29,8 @@ var EditableNarrative = function(anchor, layout) {
       this.nextSibling.firstChild.setAttribute('transform', that.label_pos(event));
 
       // recalculate the path of the people who are in that event
-      for (i=0; i<event.people.length; i++) {
-        person = event.people[i];
+      for (i=0; i<event.participants.length; i++) {
+        person = event.participants[i];
         d3.select('#P'+person.id).attr('d', that.person_path(person));
         // relocate the perosn's disc with id disc-[person.id]-[event.id]
         ct = event.ct;

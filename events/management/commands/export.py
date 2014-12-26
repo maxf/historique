@@ -1,6 +1,6 @@
 import json
 from django.core.management.base import BaseCommand, CommandError
-from events.models import Event, Person
+from events.models import Event, Person, Settings
 
 
 class Command(BaseCommand):
@@ -29,5 +29,8 @@ class Command(BaseCommand):
             for person in event.people.all():
                 event_obj['participants'].append(person.id)
             export_obj['events'].append(event_obj)
+
+        settings = Settings.objects.all()[0]
+        export_obj['settings'] = settings
 
         self.stdout.write(json.dumps(export_obj, sort_keys=True, indent=4, separators=(',', ': ')))
