@@ -29,15 +29,17 @@ class Command(BaseCommand):
                 event.day = event_obj['day']
             event.save()
             participants = []
+            participant_rank = 0
             for participant in event_obj['participants']:
                 name = import_obj['people'][str(participant)]['name']
                 people_with_that_name = Person.objects.filter(name=name)
                 person = people_with_that_name[0]
                 ep = EventPerson.objects.create(
-                    number = None,
+                    number = participant_rank,
                     event = event,
                     participant = person
                 )
+                participant_rank += 10
         settings = Settings.objects.create(
             title = import_obj['settings']['title'],
             description = import_obj['settings']['description'],

@@ -19,10 +19,7 @@
             "description": "",
             "month": 9,
             "participants": [
-                172,
-                176,
-                175,
-                173
+                172
             ],
             "photo": "",
             "title": "D. William The Conqueror",
@@ -48,9 +45,9 @@
             "description": "",
             "month": null,
             "participants": [
+                172,
                 171,
-                176,
-                172
+                176
             ],
             "photo": "",
             "title": "B. William II",
@@ -113,9 +110,9 @@
             "description": "",
             "month": null,
             "participants": [
-                175,
                 172,
-                171                
+                171,
+                175
             ],
             "photo": "",
             "title": "B. Adela of Normandy",
@@ -128,8 +125,8 @@
             "description": "",
             "month": null,
             "participants": [
-                171,
                 172,
+                171,
                 173
             ],
             "photo": "",
@@ -197,11 +194,7 @@
             "description": "",
             "month": 11,
             "participants": [
-                171,
-                172,
-                176,
-                175,
-                173
+                171
             ],
             "photo": "",
             "title": "D. Matilda of Flanders",

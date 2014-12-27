@@ -550,7 +550,7 @@ Narrative.prototype.draw_chart = function(person_id) {
       // populate the event objects with people
       for (i=0; i<that.g_events.length; i++) {
         for (j=0; j<that.g_events[i].participants.length; j++) {
-          that.g_events[i].participants[j] = that.find_person_by_id(that.g_events[i].participants[j].id);
+          that.g_events[i].participants[j] = that.find_person_by_id(that.g_events[i].participants[j].participant.id);
         }
 //        that.g_events[i].participants.sort(function(a,b) {
 //          return b.event_set.length - a.event_set.length;

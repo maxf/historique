@@ -1,4 +1,4 @@
-from events.models import Person, Event, Link
+from events.models import Person, Event, Link, EventPerson
 from rest_framework import serializers
 
 
@@ -18,8 +18,15 @@ class PersonShortSerializer(serializers.HyperlinkedModelSerializer):
         model = Person
         fields = ('id','name')
 
+class EventPersonSerializer(serializers.HyperlinkedModelSerializer):
+    participant = PersonShortSerializer()
+    class Meta:
+        model = EventPerson
+        fields = ('participant', 'number')
+        depth = 1
+
 class EventSerializer(serializers.HyperlinkedModelSerializer):
-    participants = PersonShortSerializer(many=True)
+    participants = EventPersonSerializer(source='eventperson_set', many=True)
     class Meta:
         model = Event
         fields = ('id','title','photo', 'description','year','month','day','eventType','participants','z')
