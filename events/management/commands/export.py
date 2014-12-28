@@ -1,7 +1,7 @@
-import json
+import simplejson as json
+import decimal
 from django.core.management.base import BaseCommand, CommandError
 from events.models import Event, Person, Settings
-
 
 class Command(BaseCommand):
     help = 'Export the application\'s data to a json file'
@@ -31,6 +31,19 @@ class Command(BaseCommand):
             export_obj['events'].append(event_obj)
 
         settings = Settings.objects.all()[0]
-        export_obj['settings'] = settings
+        export_obj['settings'] = {
+            'title': settings.title,
+            'description': settings.description,
+            'string_people': settings.string_people,
+            'string_no_people': settings.string_no_people,
+            'string_events': settings.string_events,
+            'string_no_events': settings.string_no_events,
+            'string_links': settings.string_links,
+            'string_no_links': settings.string_no_links,
+            'string_comments': settings.string_comments,
+            'string_no_comments': settings.string_no_comments,
+            'string_add_comment': settings.string_add_comment,
+            'string_send': settings.string_send,
+        }
 
         self.stdout.write(json.dumps(export_obj, sort_keys=True, indent=4, separators=(',', ': ')))

@@ -1,66 +1,176 @@
 {
-    "settings": {
-        "title": "Kings and Queens of England",
-        "description": "timeline of the English royals",
-        "string_people": "people",
-        "string_no_people": "no people",
-        "string_events": "events",
-        "string_no_events": "no events",
-        "string_links": "links",
-        "string_no_links": "no links",
-        "string_comments": "comments",
-        "string_no_comments": "no comments",
-        "string_add_comment": "add comment",
-        "string_send": "send"
-    },
     "events": [
-        {
-            "day": 9,
-            "description": "",
-            "month": 9,
-            "participants": [
-                172
-            ],
-            "photo": "",
-            "title": "D. William The Conqueror",
-            "type": "",
-            "year": 1087,
-            "z": null
-        },
         {
             "day": null,
             "description": "",
             "month": null,
             "participants": [
-                172
+                142
             ],
             "photo": "",
             "title": "B. William The Conqueror",
             "type": "",
             "year": 1028,
-            "z": null
+            "z": 51.3333333333
         },
         {
             "day": null,
             "description": "",
             "month": null,
             "participants": [
-                172,
-                171,
-                176
+                141
+            ],
+            "photo": "",
+            "title": "B. Matilda of Flanders",
+            "type": "",
+            "year": 1031,
+            "z": 87.7777777778
+        },
+        {
+            "day": null,
+            "description": "",
+            "month": null,
+            "participants": [
+                140
+            ],
+            "photo": "",
+            "title": "B. Stephen II",
+            "type": "",
+            "year": 1045,
+            "z": 234.2222222222
+        },
+        {
+            "day": null,
+            "description": "",
+            "month": null,
+            "participants": [
+                142,
+                141,
+                139
             ],
             "photo": "",
             "title": "B. William II",
             "type": "",
             "year": 1056,
-            "z": null
+            "z": 65.2592592593
+        },
+        {
+            "day": null,
+            "description": "",
+            "month": null,
+            "participants": [
+                142,
+                141,
+                138
+            ],
+            "photo": "",
+            "title": "B. Adela of Normandy",
+            "type": "",
+            "year": 1067,
+            "z": 63.7407407407
+        },
+        {
+            "day": null,
+            "description": "",
+            "month": null,
+            "participants": [
+                142,
+                141,
+                143
+            ],
+            "photo": "",
+            "title": "B. Henry I",
+            "type": "",
+            "year": 1068,
+            "z": 63.3333333333
+        },
+        {
+            "day": 2,
+            "description": "",
+            "month": 11,
+            "participants": [
+                141
+            ],
+            "photo": "",
+            "title": "D. Matilda of Flanders",
+            "type": "",
+            "year": 1083,
+            "z": 65.7777777778
+        },
+        {
+            "day": 9,
+            "description": "",
+            "month": 9,
+            "participants": [
+                142
+            ],
+            "photo": "",
+            "title": "D. William The Conqueror",
+            "type": "",
+            "year": 1087,
+            "z": 50.3333333333
+        },
+        {
+            "day": null,
+            "description": "",
+            "month": null,
+            "participants": [
+                138,
+                140,
+                137
+            ],
+            "photo": "",
+            "title": "B. Stephen",
+            "type": "",
+            "year": 1094,
+            "z": 230.6296296296
+        },
+        {
+            "day": 2,
+            "description": "",
+            "month": 8,
+            "participants": [
+                139
+            ],
+            "photo": "",
+            "title": "D. William II",
+            "type": "",
+            "year": 1100,
+            "z": 434.6666666667
+        },
+        {
+            "day": 7,
+            "description": "",
+            "month": 2,
+            "participants": [
+                143,
+                144
+            ],
+            "photo": "",
+            "title": "B. Empress Matilda",
+            "type": "",
+            "year": 1102,
+            "z": 85.6666666667
+        },
+        {
+            "day": 19,
+            "description": "",
+            "month": 5,
+            "participants": [
+                140
+            ],
+            "photo": "",
+            "title": "D. Stephen II",
+            "type": "",
+            "year": 1102,
+            "z": 173.2222222222
         },
         {
             "day": 1,
             "description": "",
             "month": 12,
             "participants": [
-                173
+                143
             ],
             "photo": "",
             "title": "D. Henry I",
@@ -73,7 +183,7 @@
             "description": "",
             "month": 3,
             "participants": [
-                175
+                138
             ],
             "photo": "",
             "title": "D. Adela of Normandy",
@@ -82,78 +192,11 @@
             "z": null
         },
         {
-            "day": null,
-            "description": "",
-            "month": null,
-            "participants": [
-                177
-            ],
-            "photo": "",
-            "title": "B. Stephen II",
-            "type": "",
-            "year": 1045,
-            "z": null
-        },
-        {
-            "day": 19,
-            "description": "",
-            "month": 5,
-            "participants": [177],
-            "photo": "",
-            "title": "D. Stephen II",
-            "type": "",
-            "year": 1102,
-            "z": null
-        },
-        {
-            "day": null,
-            "description": "",
-            "month": null,
-            "participants": [
-                172,
-                171,
-                175
-            ],
-            "photo": "",
-            "title": "B. Adela of Normandy",
-            "type": "",
-            "year": 1067,
-            "z": null
-        },
-        {
-            "day": null,
-            "description": "",
-            "month": null,
-            "participants": [
-                172,
-                171,
-                173
-            ],
-            "photo": "",
-            "title": "B. Henry I",
-            "type": "",
-            "year": 1068,
-            "z": null
-        },
-        {
-            "day": 2,
-            "description": "",
-            "month": 8,
-            "participants": [
-                176
-            ],
-            "photo": "",
-            "title": "D. William II",
-            "type": "",
-            "year": 1100,
-            "z": null
-        },
-        {
             "day": 25,
             "description": "",
             "month": 10,
             "participants": [
-                174
+                137
             ],
             "photo": "",
             "title": "D. Stephen",
@@ -162,66 +205,11 @@
             "z": null
         },
         {
-            "day": null,
-            "description": "",
-            "month": null,
-            "participants": [
-                171
-            ],
-            "photo": "",
-            "title": "B. Matilda of Flanders",
-            "type": "",
-            "year": 1031,
-            "z": null
-        },
-        {
-            "day": null,
-            "description": "",
-            "month": null,
-            "participants": [
-                177,
-                174,
-                175
-            ],
-            "photo": "",
-            "title": "B. Stephen",
-            "type": "",
-            "year": 1094,
-            "z": null
-        },
-        {
-            "day": 2,
-            "description": "",
-            "month": 11,
-            "participants": [
-                171
-            ],
-            "photo": "",
-            "title": "D. Matilda of Flanders",
-            "type": "",
-            "year": 1083,
-            "z": null
-        },
-        {
-            "day": 7,
-            "description": "",
-            "month": 2,
-            "participants": [
-                178,
-                173
-            ],
-            "photo": "",
-            "title": "B. Empress Matilda",
-            "type": "",
-            "year": 1102,
-            "z": null
-        },
-        {
             "day": 10,
             "description": "",
             "month": 9,
             "participants": [
-                178
+                144
             ],
             "photo": "",
             "title": "D. Empress Matilda",
@@ -231,37 +219,51 @@
         }
     ],
     "people": {
-        "171": {
-            "name": "Matilda of Flanders",
-            "photo": ""
-        },
-        "172": {
-            "name": "William The Conqueror",
-            "photo": ""
-        },
-        "173": {
-            "name": "Henry I",
-            "photo": ""
-        },
-        "174": {
+        "137": {
             "name": "Stephen",
             "photo": ""
         },
-        "175": {
+        "138": {
             "name": "Adela of Normandy",
             "photo": ""
         },
-        "176": {
+        "139": {
             "name": "William II",
             "photo": ""
         },
-        "177": {
+        "140": {
             "name": "Stephen II, Compte de Blois",
             "photo": ""
         },
-        "178": {
+        "141": {
+            "name": "Matilda of Flanders",
+            "photo": ""
+        },
+        "142": {
+            "name": "William The Conqueror",
+            "photo": ""
+        },
+        "143": {
+            "name": "Henry I",
+            "photo": ""
+        },
+        "144": {
             "name": "Empress Matilda",
-            "photo": "https://en.wikipedia.org/wiki/File:Empress_Mathilda.png"
+            "photo": ""
         }
+    },
+    "settings": {
+        "description": "timeline of the English royals",
+        "string_add_comment": "add comment",
+        "string_comments": "comments",
+        "string_events": "events",
+        "string_links": "links",
+        "string_no_comments": "no comments",
+        "string_no_events": "no events",
+        "string_no_links": "no links",
+        "string_no_people": "no people",
+        "string_people": "people",
+        "string_send": "send",
+        "title": "Kings and Queens of England"
     }
 }

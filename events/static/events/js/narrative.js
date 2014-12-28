@@ -547,6 +547,19 @@ Narrative.prototype.draw_chart = function(person_id) {
 //        return b.event_set.length - a.event_set.length;
 //      });
 
+
+
+
+
+
+
+      // sort participants
+      for (i=0; i<that.g_events.length; i++) {
+        console.log(JSON.stringify(that.g_events[i].participants));
+        that.g_events[i].participants.sort(function(a,b) { return a.number - b.number; });
+        console.log(JSON.stringify(that.g_events[i].participants));
+      }
+
       // populate the event objects with people
       for (i=0; i<that.g_events.length; i++) {
         for (j=0; j<that.g_events[i].participants.length; j++) {
