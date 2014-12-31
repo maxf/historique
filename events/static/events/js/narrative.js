@@ -311,6 +311,7 @@ Narrative.prototype.draw_people = function() {
         .attr('d', person.path)
         .attr('class', 'person-path')
         .style('stroke', person.color)
+        .style('stroke-width', '8px')
         .attr('id', 'P'+person.id)
 //          .on('click', function() {
 //            person_popup(this.id.substr(1), d3.mouse(this));
@@ -318,7 +319,7 @@ Narrative.prototype.draw_people = function() {
       ;
       }
 
-      radius = Math.sqrt(4*this.g_people_spacing_in_event);
+      radius = Math.sqrt(3*this.g_people_spacing_in_event);
 
       person_events = this.g_events.filter(function(event) { return event.participants.indexOf(person) !== -1; });
       for (j=0; j<person_events.length; j++) {
@@ -374,7 +375,7 @@ Narrative.prototype.calc_events_chart_data = function() {
     event = this.g_events[i];
     event.ct = this.g_timescale(event.dateInt);
     event.rz = this.g_people_spacing_in_event*event.participants.length/2;
-    event.rt = this.g_people_spacing_in_event/2;
+    event.rt = this.g_people_spacing_in_event/2.5;
     // adjust event if needed
     // we compute an event's Z by averaging the default_pos of its participants
     sum_default_pos = 0;
@@ -573,15 +574,15 @@ Narrative.prototype.draw_chart = function(person_id) {
       // create svg for the chart
 
       if (that.g_vertical) {
-        that.g_width = 500;
-        that.g_height = 6000;
+        that.g_width = 800;
+        that.g_height = 2000;
         that.g_size.t = that.g_height;
         that.g_size.z = that.g_width;
         canvas_width = that.g_size.z + 2*that.g_margin.start_z;
         canvas_height = that.g_size.t + 2*that.g_margin.start_t;
       } else {
-        that.g_width = 6000;
-        that.g_height = 500;
+        that.g_width = 2000;
+        that.g_height = 800;
         that.g_size.t = that.g_width;
         that.g_size.z = that.g_height;
         canvas_width = that.g_size.t + 2*that.g_margin.start_t;
@@ -616,7 +617,7 @@ Narrative.prototype.draw_chart = function(person_id) {
       // background colour
       that.g_svg
         .append('rect')
-        .attr('fill','#ddd')
+        .attr('fill','#fff')
         .attr('x',-100000)
         .attr('y',-100000)
         .attr('width',200000)

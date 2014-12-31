@@ -1,9 +1,9 @@
 html {
-  background: url(/static/events/img/bg.jpg) no-repeat top center fixed; 
+  background: url(/static/events/img/bg.jpg) no-repeat top center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
-  background-size: cover;  
+  background-size: cover;
 }
 
 body {
@@ -19,4 +19,4 @@ h1, p {
   text-shadow: 0.1em 0.1em #000
 }
 */
-svg { background-color: #ddd; }
+/* svg { background-color: #ddd; } */
