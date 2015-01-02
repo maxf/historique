@@ -26,7 +26,7 @@ class Command(BaseCommand):
                           'photo':event.photo,
                           'z':event.z,
                           'participants':[] }
-            for person in event.participants.all():
+            for person in event.participants.all().order_by('number'):
                 event_obj['participants'].append(person.id)
             export_obj['events'].append(event_obj)
 
