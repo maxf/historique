@@ -13,12 +13,6 @@
   shape-rendering: crispEdges;
 }
 
-.event-text {
-  fill: black;
-  font-family: sans-serif;
-  font-size: 18;
-  font-weight: bold;
-}
 
 .event-text-not-main {
   fill: black;

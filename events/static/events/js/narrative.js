@@ -21,7 +21,7 @@ Narrative = function(anchor, layout) {
   this.g_vertical = layout === 'vertical';
   this.g_person_url_prefix = '/events/person/';
   this.g_event_url_prefix = '/events/event/';
-  this.g_margin = { start_t: 50, start_z: 20 };
+  this.g_margin = { start_t: 100, start_z: 20 };
   this.g_curvature = 0.3;
   this.g_color_scale = d3.scale.category20();
   this.g_people_spacing_in_event = 17;
@@ -311,7 +311,7 @@ Narrative.prototype.draw_people = function() {
         .attr('d', person.path)
         .attr('class', 'person-path')
         .style('stroke', person.color)
-        .style('stroke-width', '8px')
+        .style('stroke-width', '6px')
         .attr('id', 'P'+person.id)
 //          .on('click', function() {
 //            person_popup(this.id.substr(1), d3.mouse(this));
@@ -397,7 +397,7 @@ Narrative.prototype.label_pos = function(event) {
   if (this.g_vertical) {
     return 'translate('+(event.cz+event.rz)+','+event.ct+')';
   } else {
-    return 'translate('+event.ct+', '+(event.cz-event.rz)+') rotate(-70)';
+    return 'translate('+event.ct+', '+(event.cz-event.rz)+') rotate(0)';
   }
 }
 
@@ -465,7 +465,7 @@ Narrative.prototype.pan_to = function(x,y) {
   } else {
     this.g_svg.attr('transform', ' translate(' + (-x+this.g_margin.start_t) + ',' + (-y+this.g_margin.start_z) + ')');
   }
-}
+};
 
 
 Narrative.prototype.draw_axes = function() {
@@ -655,8 +655,8 @@ Narrative.prototype.draw_events = function() {
       .attr('xlink:href', function(event) { return this.g_event_url_prefix+event.id; })
       .append('text')
       .attr('transform', this.label_pos)
-      .attr('text-anchor', 'start')
+      .attr('text-anchor', 'middle')
       .attr('class', 'event-text')
-      .text( function(event) { return that.abbreviate(event.title,20); })
+      .text( function(event) { return that.abbreviate(event.title,50); })
     ;
 };

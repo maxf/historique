@@ -79,8 +79,8 @@ Narrative.prototype.draw_events = function() {
       .attr('xlink:href', function(event) { return this.g_event_url_prefix+event.id; })
       .append('text')
       .attr('transform', this.label_pos)
-      .attr('text-anchor', 'start')
+      .attr('text-anchor', 'middle')
       .attr('class', 'event-text')
-      .text( function(event) { return that.abbreviate(event.title,20); })
+      .text( function(event) { return that.abbreviate(event.title,50); })
     ;
 };
