@@ -27,6 +27,8 @@ class Command(BaseCommand):
                 event.month = event_obj['month']
             if 'day' in event_obj:
                 event.day = event_obj['day']
+            if 'z' in event_obj:
+                event.z = event_obj['z']
             event.save()
             participants = []
             participant_rank = 0
