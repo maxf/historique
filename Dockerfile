@@ -7,7 +7,7 @@ MAINTAINER Max Froumentin <max@froumentin.net>
 # docker logs -f 7fddedfc2205
 
 # docker build -t="maxf/historique:v1" .
-# docker run -t -p 8000:8000 --name timelines --link some-postgres:pg maxf/historique:v1
+# docker run -t -p 8000 --name timelines --link some-postgres:pg maxf/historique:v1
 # docker exec -it 6fac691c7fb7 bash
 
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
@@ -24,9 +24,10 @@ RUN pip install -r requirements.txt
 USER webapp
 COPY . /home/webapp/historique/
 EXPOSE 8000
+WORKDIR /home/webapp/
+RUN mkdir static
 WORKDIR /home/webapp/historique
 
-# use "CMD ./docker-run.sh import" to initialise the application with saved data
-CMD ./docker-run.sh
+CMD ./docker-run.sh import
 
 
