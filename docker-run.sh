@@ -13,5 +13,6 @@ if [[ $1 -eq import ]]; then
     ./manage.py import < data/timeline.json
 fi
 
+echo starting the server
 #./manage.py runserver 0.0.0.0:8000
-gunicorn timelines.wsgi
+gunicorn -b 0.0.0.0:8000 timelines.wsgi
