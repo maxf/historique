@@ -8,8 +8,10 @@ MAINTAINER Max Froumentin <max@froumentin.net>
 
 # docker build -t="maxf/historique:v1" .
 # docker run -it -p 8000:8000 --name timelines --link timelines-db:pg maxf/historique:v1
-# docker exec -it 6fac691c7fb7 bash
+# docker exec -it timelines bash
 # docker images --filter "dangling=true" -q | xargs docker rmi
+#
+# docker cp timelines:/home/webapp/static .
 
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 RUN apt-get update
@@ -27,8 +29,8 @@ COPY . /home/webapp/historique/
 EXPOSE 8000
 WORKDIR /home/webapp/
 RUN mkdir static
-WORKDIR /home/webapp/historique
 
+WORKDIR /home/webapp/historique
 CMD ./docker-run.sh import
 
 
