@@ -31,6 +31,7 @@ WORKDIR /home/webapp/
 RUN mkdir static
 
 WORKDIR /home/webapp/historique
+ENV ADMIN_PASSWORD=${ADMIN_PASSWORD}
 CMD ./docker-run.sh import
 
 
