@@ -7,7 +7,7 @@ MAINTAINER Max Froumentin <max@froumentin.net>
 # docker logs -f 7fddedfc2205
 
 # docker build -t="maxf/historique:v1" .
-# docker run -it -p 8000:8000 --name timelines --link timelines-db:pg maxf/historique:v1
+# docker run -d -p 8000:8000 --name timelines --link timelines-db:pg maxf/historique:v1
 # docker exec -it timelines bash
 # docker images --filter "dangling=true" -q | xargs docker rmi
 #
