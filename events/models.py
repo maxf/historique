@@ -54,8 +54,9 @@ class Event(models.Model):
 class EventPerson(models.Model):
     number = models.PositiveSmallIntegerField(blank=True, null=True)
     event = models.ForeignKey(Event)
-    participant = models.ForeignKey(Person)
-
+    participant = models.ForeignKey(Person, related_name='link_to_person')
+    class Meta:
+        ordering = ('number',)
 
 class Comment(models.Model):
     text = models.CharField(max_length=2000)
