@@ -2,6 +2,7 @@
 
 if [ -z "$1" ]; then
     echo "Usage: $0 admin-password"
+    exit
 fi
 
 
@@ -30,5 +31,5 @@ cp nginx.conf /etc/nginx/sites-enabled/default
 
 docker rm -f timelines
 docker build -t="maxf/historique:v1" .
-docker run -d -p 8000:8000  -e "ADMIN_PASSWORD=${ADMIN_PASSWORD}" --name timelines --link timelines-db:pg maxf/historique:v1
+docker run -d -p 8000:8000  -e ADMIN_PASSWORD=${ADMIN_PASSWORD} --name timelines --link timelines-db:pg maxf/historique:v1
 docker cp timelines:/home/webapp/static /home/ubuntu/static
