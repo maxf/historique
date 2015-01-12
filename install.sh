@@ -1,9 +1,15 @@
 #!/bin/bash
 
-ADMIN_PASSWORD=foobar
+if [ -z "$1" ]; then
+    echo "Usage: $0 admin-password"
+fi
 
-apt-get update
-apt-get upgrade
+
+
+ADMIN_PASSWORD=$1
+
+#apt-get -y update
+#apt-get -y upgrade
 apt-get install git nginx
 
 # docker
@@ -16,7 +22,7 @@ apt-get install lxc-docker
 docker rm -f timelines-db
 docker run --name timelines-db -e POSTGRES_PASSWORD=timelines -d postgres
 
-
+rm -rf historique
 git clone https://github.com/maxf/historique.git
 cd historique
 cp /etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/default.bak
@@ -24,5 +30,5 @@ cp nginx.conf /etc/nginx/sites-enabled/default
 
 docker rm -f timelines
 docker build -t="maxf/historique:v1" .
-docker run -p 8000:8000 --name timelines --link timelines-db:pg maxf/historique:v1 -e "ADMIN_PASSWORD=${ADMIN_PASSWORD}"
+docker run -d -p 8000:8000  -e "ADMIN_PASSWORD=${ADMIN_PASSWORD}" --name timelines --link timelines-db:pg maxf/historique:v1
 docker cp timelines:/home/webapp/static /home/ubuntu/static
