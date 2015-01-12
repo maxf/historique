@@ -15,7 +15,7 @@ docker rm -f timelines-db
 docker run --name timelines-db -e POSTGRES_PASSWORD=timelines -d postgres
 
 
-git clone git@github.com:maxf/historique.git
+git clone https://github.com/maxf/historique.git
 cd historique
 cp /etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/default.bak
 cp nginx.conf /etc/nginx/sites-enabled/default
