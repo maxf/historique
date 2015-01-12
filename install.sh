@@ -1,7 +1,9 @@
 #!/bin/bash
 
+ADMIN_PASSWORD=foobar
+
 apt-get update
-apt-get upgrate
+apt-get upgrade
 apt-get install git nginx
 
 # docker
@@ -22,5 +24,5 @@ cp nginx.conf /etc/nginx/sites-enabled/default
 
 docker rm -f timelines
 docker build -t="maxf/historique:v1" .
-docker run -p 8000:8000 --name timelines --link timelines-db:pg maxf/historique:v1
+docker run -p 8000:8000 --name timelines --link timelines-db:pg maxf/historique:v1 -e "ADMIN_PASSWORD=${ADMIN_PASSWORD}"
 docker cp timelines:/home/webapp/static /home/ubuntu/static
