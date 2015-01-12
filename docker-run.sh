@@ -7,7 +7,7 @@ export STATIC_ROOT=/home/webapp/static/
 ./manage.py migrate
 ./manage.py createsuperuser --noinput --username=admin --email=a@b.com
 ./change-admin-password ${ADMIN_PASSWORD}
-./manage.py collectstatic
+./manage.py collectstatic --noinput
 
 if [[ $1 -eq import ]]; then
     echo importing from initial data
